@@ -128,7 +128,7 @@
       :limit.sync="listQuery.limit"
       @pagination="getList"
     />
-    <!-- 修改 -->
+    <!-- 新增/修改 -->
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form
         ref="dataForm"
@@ -138,36 +138,64 @@
         label-width="70px"
         style="width: 400px; margin-left: 50px"
       >
-      <!-- 新建用户 -->
-        <el-form-item label="账号" v-if="dialogStatus === 'create'" prop="loginName" label-width="100px">
+        <!-- 新建用户 -->
+        <el-form-item
+          label="账号"
+          v-if="dialogStatus === 'create'"
+          prop="loginName"
+          label-width="100px"
+        >
           <el-input v-model="temps.loginName" placeholder="请输入账号" />
         </el-form-item>
-        <el-form-item label="密码" v-if="dialogStatus === 'create'" prop="loginName" label-width="100px">
+        <el-form-item
+          label="密码"
+          v-if="dialogStatus === 'create'"
+          prop="loginName"
+          label-width="100px"
+        >
           <el-input v-model="temps.password" placeholder="请输入密码" />
         </el-form-item>
-        <el-form-item label="手机号" v-if="dialogStatus === 'create'" prop="phone" label-width="100px">
+        <el-form-item
+          label="手机号"
+          v-if="dialogStatus === 'create'"
+          prop="phone"
+          label-width="100px"
+        >
           <el-input v-model="temps.phone" placeholder="请输入手机号" />
         </el-form-item>
         <!-- 修改 -->
-        <el-form-item label="用户id" v-if="dialogStatus !== 'create'" prop="loginName" label-width="100px">
+        <el-form-item
+          label="用户id"
+          v-if="dialogStatus !== 'create'"
+          prop="loginName"
+          label-width="100px"
+        >
           <el-input v-model="temps.id" placeholder="请输入账号" />
         </el-form-item>
-        <el-form-item label="原密码" v-if="dialogStatus !== 'create'" prop="loginName" label-width="100px">
+        <el-form-item
+          label="原密码"
+          v-if="dialogStatus !== 'create'"
+          prop="loginName"
+          label-width="100px"
+        >
           <el-input v-model="temps.password" placeholder="请输入密码" />
         </el-form-item>
-        <el-form-item label="新密码" v-if="dialogStatus !== 'create'" prop="phone" label-width="100px">
+        <el-form-item
+          label="新密码"
+          v-if="dialogStatus !== 'create'"
+          prop="phone"
+          label-width="100px"
+        >
           <el-input v-model="temps.newPassword" placeholder="请输入新密码" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">
-          {{ $t("table.cancel") }}
-        </el-button>
+        <el-button @click="dialogFormVisible = false"> 取 消 </el-button>
         <el-button
           type="primary"
           @click="dialogStatus === 'create' ? createData() : updateData()"
         >
-          {{ $t("table.confirm") }}
+          确 定
         </el-button>
       </div>
     </el-dialog>
@@ -240,6 +268,7 @@ import {
   createArticle,
   updateArticle,
   modRole,
+  Delete,
 } from "@/api/user_management/user";
 import waves from "@/directive/waves"; // waves directive
 import { parseTime } from "@/utils";
@@ -449,7 +478,15 @@ export default {
       };
     },
     handleCreate() {
-      this.resetTemp();
+      (this.temps = {
+        loginName: "",
+        password: "",
+        phone: "",
+        avatar:
+          "https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif?imageView2/1/w/80/h/80",
+        introduction: "Permissions",
+      }),
+        this.resetTemp();
       this.dialogStatus = "create";
       this.dialogFormVisible = true;
       this.$nextTick(() => {
@@ -464,6 +501,7 @@ export default {
           createArticle(this.temps).then((res) => {
             console.log("新增用户", res);
             if (res.success) {
+              this.getList();
               // this.list.unshift(this.temp);
               this.dialogFormVisible = false;
               this.$notify({
@@ -497,7 +535,6 @@ export default {
           this.getList();
           this.dialogFormVisible2 = false;
         } else {
-          
           console.error("修改用户角色身份失败");
         }
       });
@@ -530,32 +567,42 @@ export default {
     updateData() {
       this.$refs["dataForm"].validate((valid) => {
         if (valid) {
-          // const tempData = Object.assign({}, this.temp);
-          // tempData.timestamp = +new Date(tempData.timestamp); // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          updateArticle(temps).then((res) => {
-            // const index = this.list.findIndex((v) => v.id === this.temp.id);
-            // this.list.splice(index, 1, this.temp);
-            // this.dialogFormVisible = false;
-            console.log("新增用户", res);
-            // this.$notify({
-            //   title: "成功",
-            //   message: "更新成功",
-            //   type: "success",
-            //   duration: 2000,
-            // });
+          updateArticle(this.temps).then((res) => {
+            console.log("修改用户密码", res);
+            if (res.success) {
+              this.getList();
+              this.$notify({
+                title: "成功",
+                message: "" + res.message,
+                type: "success",
+                duration: 2000,
+              });
+              this.dialogFormVisible = false;
+            } else {
+              console.log("修改用户密码失败", res);
+            }
           });
         }
       });
     },
+    // 删除用户
     handleDelete(row, index) {
-      this.$notify({
-        title: "成功",
-        message: "删除成功",
-        type: "success",
-        duration: 2000,
+      Delete(row).then((res) => {
+        console.log("删除用户", res);
+        if (res.success) {
+          this.getList();
+          this.$notify({
+            title: "成功",
+            message: "" + res.message,
+            type: "success",
+            duration: 2000,
+          });
+        } else {
+          console.log("删除用户", res);
+        }
       });
-      this.list.splice(index, 1);
     },
+    // 
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
         this.pvData = response.data.pvData;

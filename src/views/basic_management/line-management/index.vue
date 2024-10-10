@@ -1,10 +1,10 @@
 <template>
   <div class="app-container lin_management">
-    <div class="filter-container" >
+    <div class="filter-container">
       <el-form :inline="true">
         <el-form-item label="列车线路">
           <el-input
-            v-model="listQuery.title"
+            v-model="listQuery.lineId"
             placeholder="线路"
             style="width: 200px; margin-right: 10px"
             class="filter-item"
@@ -23,13 +23,15 @@
         <el-form-item>
           <el-button
             v-waves
+            :loading="downloadLoading"
             class="filter-item"
             type="primary"
-            icon="el-icon-search"
-            @click="handleFilter"
+            icon="el-icon-refresh"
+            @click="handleDownload"
           >
-            搜索
+            重置
           </el-button>
+
           <el-button
             class="filter-item"
             style="margin-left: 10px"
@@ -41,13 +43,12 @@
           </el-button>
           <el-button
             v-waves
-            :loading="downloadLoading"
             class="filter-item"
             type="primary"
-            icon="el-icon-refresh"
-            @click="handleDownload"
+            icon="el-icon-search"
+            @click="handleFilter"
           >
-            重置
+            搜索
           </el-button>
         </el-form-item>
       </el-form>
@@ -57,7 +58,7 @@
       :key="tableKey"
       v-loading="listLoading"
       :data="line_list"
-      :header-cell-style="{ backgroundColor: 'rgb(244, 243, 249)' }" 
+      :header-cell-style="{ backgroundColor: 'rgb(244, 243, 249)' }"
       border
       fit
       highlight-current-row
@@ -77,27 +78,29 @@
       </el-table-column>
       <el-table-column label="省" min-width="150px" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.sheng }}</span>
+          <span>{{ row.province === null ? "--" : row.province }}</span>
         </template>
       </el-table-column>
       <el-table-column label="市" min-width="150px" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.shi }}</span>
+          <span>{{ row.city === null ? "--" : row.city }}</span>
         </template>
       </el-table-column>
       <el-table-column label="线路" min-width="110px" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.xianlu }}</span>
+          <span>{{ row.name === null ? "--" : row.name }}</span>
         </template>
       </el-table-column>
       <el-table-column label="编组" min-width="110px" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.bianzu }}</span>
+          <span>{{ row.grouping === null ? "--" : row.grouping }}</span>
         </template>
       </el-table-column>
       <el-table-column label="单节车设备数" min-width="100px" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.xxx }}</span>
+          <span>{{
+            row.devicePerCarriage === null ? "--" : row.devicePerCarriage
+          }}</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -139,23 +142,26 @@
         label-width="70px"
         style="width: 400px; margin-left: 50px"
       >
-        <el-form-item label="省/市" prop="type" label-width="100px">
+        <el-form-item label="省/市" prop="province" label-width="100px">
           <el-cascader
-            v-model="temps.sheng"
+            v-model="temps.province"
             size="large"
             :options="pcTextArr"
             style="width: 200px; margin-right: 10px; height: 32px"
           />
         </el-form-item>
 
-        <el-form-item label="线路" prop="title" label-width="100px">
-          <el-input v-model="temps.xianlu"  placeholder="请选择线路" />
+        <el-form-item label="线路" prop="name" label-width="100px">
+          <el-input v-model="temps.name" placeholder="请选择线路" />
         </el-form-item>
-        <el-form-item label="单车节设备数" label-width="100px" >
-          <el-input v-model="temps.bianzu"  placeholder="请选择单车节设备数"/>
+        <el-form-item label="单车节设备数" label-width="100px">
+          <el-input v-model="temps.grouping" placeholder="请选择单车节设备数" />
         </el-form-item>
         <el-form-item label="编组" label-width="100px">
-          <el-input v-model="temps.xxx" placeholder="请输入编组" />
+          <el-input
+            v-model="temps.devicePerCarriage"
+            placeholder="请输入编组"
+          />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -198,6 +204,11 @@ import {
   createArticle,
   updateArticle,
 } from "@/api/article";
+import {
+  Lines,
+  addLines,
+  updateLines,
+} from "@/api/basic_management/line-management";
 import waves from "@/directive/waves"; // waves directive
 import { parseTime } from "@/utils";
 import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
@@ -245,61 +256,64 @@ export default {
       // 地址选择器
       pcTextArr,
       selectedOptions: [],
-
       tableKey: 0,
       line_list: [
         {
           id: "1",
-          sheng: "广东省",
-          shi: "揭阳市",
-          xianlu: "10001",
-          bianzu: "01",
-          xxx: "1",
+          province: "广东省",
+          city: "揭阳市",
+          name: "10001",
+          grouping: "01",
+          devicePerCarriage: "1",
         },
         {
           id: "2",
-          sheng: "广东省",
-          shi: "揭阳市",
-          xianlu: "10001",
-          bianzu: "02",
-          xxx: "2",
+          province: "广东省",
+          city: "揭阳市",
+          name: "10001",
+          grouping: "02",
+          devicePerCarriage: "2",
         },
         {
           id: "3",
-          sheng: "广东省",
-          shi: "普宁市",
-          xianlu: "10002",
-          bianzu: "01",
-          xxx: "1",
+          province: "广东省",
+          city: "普宁市",
+          name: "10002",
+          grouping: "01",
+          devicePerCarriage: "1",
         },
         {
           id: "4",
-          sheng: "广东省",
-          shi: "普宁市",
-          xianlu: "10002",
-          bianzu: "02",
-          xxx: "2",
+          province: "广东省",
+          city: "普宁市",
+          name: "10002",
+          grouping: "02",
+          devicePerCarriage: "2",
         },
       ],
       total: 4,
       listLoading: true,
-        // 新增/修改 对应表单
-        temps:{
-          id: "",
-          sheng: "",
-          shi: "",
-          xianlu: "",
-          bianzu: "",
-          xxx: "",
-        },
-
+      // 新增/修改 对应表单
+      temps: {
+        id: "",
+        province: "",
+        city: "",
+        name: "",
+        grouping: "",
+        devicePerCarriage: "",
+      },
 
       // -------------------------
       listQuery: {
+        // 线路
+        lineId: undefined,
+        // 省
+        province: undefined,
+        // 市
+        city: undefined,
         page: 1,
         limit: 10,
         importance: undefined,
-        title: undefined,
         type: undefined,
         sort: "+id",
       },
@@ -347,18 +361,44 @@ export default {
     this.getList();
   },
   methods: {
-    getList() {
-      // this.listLoading = true
-      // fetchList(this.listQuery).then((response) => {
-      //   this.list = response.data.items
-      //   this.total = response.data.total
-      //   this.listLoading = false
-      // })
-      this.listLoading = false;
+    getList(form) {
+      this.listLoading = true;
+      if (form) {
+        Lines(form).then((response) => {
+          console.log("线路管理list", response);
+          this.line_list = response.data;
+          this.total = response.data.length;
+          this.listLoading = false;
+        });
+      } else {
+        Lines().then((response) => {
+          console.log("线路管理list", response);
+          this.line_list = response.data;
+          this.total = response.data.length;
+          this.listLoading = false;
+        });
+      }
+    },
+    // 清除temps
+    clear_temps() {
+      this.temps = {
+        id: "",
+        province: "",
+        city: "",
+        name: "",
+        grouping: "",
+        devicePerCarriage: "",
+      };
+      this.selectedOptions= []
     },
     handleFilter() {
+      //  selectedOptions   listQuery
+      // 省 province   市 city
       this.listQuery.page = 1;
-      this.getList();
+      this.listQuery.province = this.selectedOptions[0];
+      this.listQuery.city = this.selectedOptions[1];
+
+      this.getList(this.listQuery);
     },
     handleModifyStatus(row, status) {
       this.$message({
@@ -393,20 +433,27 @@ export default {
       };
     },
     handleCreate() {
-      this.resetTemp();
+      // 清除temps
+      this.clear_temps();
       this.dialogStatus = "create";
       this.dialogFormVisible = true;
       this.$nextTick(() => {
         this.$refs["dataForm"].clearValidate();
       });
     },
+    // 取消新增 或者 取消修改
+    cancel_adjust() {
+      this.clear_temps();
+      this.dialogFormVisible = false;
+    },
+
+    // 新增线路
     createData() {
       this.$refs["dataForm"].validate((valid) => {
         if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024; // mock a id
-          this.temp.author = "vue-element-admin";
-          createArticle(this.temp).then(() => {
-            this.list.unshift(this.temp);
+          addLines(this.temps).then((res) => {
+            console.log("新增线路", res);
+            this.getList();
             this.dialogFormVisible = false;
             this.$notify({
               title: "成功",
@@ -419,23 +466,29 @@ export default {
       });
     },
     handleUpdate(row) {
-      this.temp = Object.assign({}, row); // copy obj
-      this.temp.timestamp = new Date(this.temp.timestamp);
-      console.log('操作的对象',this.temp);
+      this.temps = Object.assign({}, row); // copy obj
+      let tmp = this.temps.province;
+      this.temps.province = [tmp, this.temps.city];
+      // this.temp.timestamp = new Date(this.temp.timestamp);
+      console.log("操作的对象", this.temp);
       this.dialogStatus = "update";
       this.dialogFormVisible = true;
       this.$nextTick(() => {
         this.$refs["dataForm"].clearValidate();
       });
     },
+    // 修改线路
     updateData() {
       this.$refs["dataForm"].validate((valid) => {
         if (valid) {
-          const tempData = Object.assign({}, this.temp);
-          tempData.timestamp = +new Date(tempData.timestamp); // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          updateArticle(tempData).then(() => {
-            const index = this.list.findIndex((v) => v.id === this.temp.id);
-            this.list.splice(index, 1, this.temp);
+          const tempData = Object.assign({}, this.temps);
+          // tempData.timestamp = +new Date(tempData.timestamp); // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
+          updateLines(tempData).then(() => {
+            // const index = this.list.findIndex((v) => v.id === this.temp.id);
+            // this.list.splice(index, 1, this.temp);
+            this.listQuery.province = this.selectedOptions[0];
+            this.listQuery.city = this.selectedOptions[1];
+            this.getList(this.listQuery);
             this.dialogFormVisible = false;
             this.$notify({
               title: "成功",
@@ -462,25 +515,10 @@ export default {
         this.dialogPvVisible = true;
       });
     },
+    // 重置
     handleDownload() {
-      this.downloadLoading = true;
-      import("@/vendor/Export2Excel").then((excel) => {
-        const tHeader = ["timestamp", "title", "type", "importance", "status"];
-        const filterVal = [
-          "timestamp",
-          "title",
-          "type",
-          "importance",
-          "status",
-        ];
-        const data = this.formatJson(filterVal);
-        excel.export_json_to_excel({
-          header: tHeader,
-          data,
-          filename: "table-list",
-        });
-        this.downloadLoading = false;
-      });
+      this.clear_temps();
+      this.getList();
     },
     formatJson(filterVal) {
       return this.list.map((v) =>

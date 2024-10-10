@@ -4,15 +4,19 @@ export function fetchList(data) {
   return request({
     url: '/api/User/All',
     method: 'get',
-    // data: data
+    // params: data
   })
 }
-// 新增账号
+// 修改账号信息
 export function updateArticle(data) {
   return request({
     url: '/api/User/ChangePassword',
     method: 'post',
-    data: data
+    data: {
+      id: data.id,
+      password: data.password,
+      newPassword: data.newPassword
+    }
   })
 }
 // 新增账号
@@ -21,6 +25,16 @@ export function createArticle(data) {
     url: '/api/User/Signup',
     method: 'post',
     data: data
+  })
+}
+// 删除账号
+export function Delete(data) {
+  return request({
+    url: '/api/User/Delete',
+    method: 'post',
+    data: {
+      id:data.id
+    }
   })
 }
 // 获取用户角色列表

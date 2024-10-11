@@ -32,7 +32,7 @@
         style="margin-left: 10px"
         type="primary"
         icon="el-icon-edit"
-        @click=""
+        @click="handleAddRole"
       >
         新增
       </el-button>
@@ -43,11 +43,16 @@
       style="width: 100%; margin-bottom: 20px"
       row-key="id"
       border
-      :header-cell-style="{ backgroundColor: 'rgb(244, 243, 249)' }" 
+      :header-cell-style="{ backgroundColor: 'rgb(244, 243, 249)' }"
     >
       <el-table-column prop="name" label="部门" min-width="180" align="center">
       </el-table-column>
-      <el-table-column prop="date" label="创建时间" min-width="180" align="center">
+      <el-table-column
+        prop="time"
+        label="创建时间"
+        min-width="180"
+        align="center"
+      >
       </el-table-column>
       <el-table-column
         :label="$t('table.actions')"
@@ -71,7 +76,7 @@
       </el-table-column>
     </el-table>
     <!-- 弹出层 -->
-    <el-dialog title="修改" :visible.sync="dialogFormVisible">
+    <el-dialog title="修改" :visible.sync="dialogVisible">
       <el-form
         ref="dataForm"
         :rules="rules"
@@ -80,15 +85,25 @@
         label-width="70px"
         style="width: 400px; margin-left: 50px"
       >
-        <el-form-item label="线路" prop="title" label-width="100px" >
+        <el-form-item label="线路" prop="title" label-width="100px">
           <el-input v-model="temps.xianlu" placeholder="请输入线路号" />
         </el-form-item>
-        <el-form-item label="列车号" label-width="100px" >
+
+        <el-form-item label="上级菜单" prop="parentId"  label-width="100px">
+          <el-cascader
+            v-model="id"
+            :options="tableData"
+            :props="{value: 'id', label: 'name' }"
+            @change="handleChange"
+            style="width: 100%;" 
+          ></el-cascader>
+        </el-form-item>
+        <el-form-item label="列车号" label-width="100px">
           <el-input v-model="temps.liechehao" placeholder="请输入列车号" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">
+        <el-button @click="dialogVisible = false">
           {{ $t("table.cancel") }}
         </el-button>
         <el-button
@@ -103,35 +118,37 @@
 </template>
 
 <script>
+import { getOrgStructure } from "@/api/system_administration/organizational_management";
 export default {
   data() {
     return {
+      a: null,
       // 表格数据
       tableData: [
         {
           id: 3,
           name: "wangxiaohu",
-          date: "2016-05-01",
+          time: "2016-05-01",
           children: [
             {
               id: 31,
               name: "wangxiaohu",
-              date: "2016-05-01",
+              time: "2016-05-01",
             },
             {
               id: 32,
               name: "wangxiaohu",
-              date: "2016-05-01",
+              time: "2016-05-01",
               children: [
                 {
                   id: 41,
                   name: "wangxiaohu",
-                  date: "2016-05-01",
+                  time: "2016-05-01",
                 },
                 {
                   id: 42,
                   name: "wangxiaohu",
-                  date: "2016-05-01",
+                  time: "2016-05-01",
                 },
               ],
             },
@@ -140,7 +157,7 @@ export default {
         {
           id: 4,
           name: "wangxiaohu",
-          date: "2016-05-03",
+          time: "2016-05-03",
         },
       ],
       //查询数据
@@ -167,7 +184,11 @@ export default {
         },
       },
       textMap: "",
-      dialogFormVisible: false,
+      // dialogFormVisible: false,
+      dialogType: null,
+      dialogVisible: false,
+      // 下拉框 菜单树选项
+      menuOptions: [],
     };
   },
   computed: {
@@ -175,19 +196,62 @@ export default {
       return this.routes;
     },
   },
-  created() {},
+  created() {
+    this.getList();
+  },
   methods: {
+    getList(form) {
+      this.listLoading = true;
+      getOrgStructure().then((response) => {
+        if (response.success) {
+          console.log("组织结构管理list:", response);
+          this.tableData = [response.data];
+          // this.total = response.data.length;
+          this.listLoading = false;
+        } else {
+          console.error("组织结构管理list获取失败");
+        }
+      });
+    },
+    // 点击新增
+    handleAddRole() {
+      // this.role = Object.assign({}, defaultRole);
+      // if (this.$refs.tree) {
+      //   this.$refs.tree.setCheckedNodes([]);
+      // }
+      this.dialogType = "new";
+      this.dialogVisible = true;
+    },
+    // 新增
+    createData() {
+      this.$refs["dataForm"].validate((valid) => {
+        if (valid) {
+          addLines(this.temps).then((res) => {
+            console.log("新增部门", res);
+            this.getList();
+            this.dialogFormVisible = false;
+            this.$notify({
+              title: "成功",
+              message: "创建成功",
+              type: "success",
+              duration: 2000,
+            });
+          });
+        }
+      });
+    },
+
     load(tree, treeNode, resolve) {
       setTimeout(() => {
         resolve([
           {
             id: 31,
-            date: "2016-05-01",
+            time: "2016-05-01",
             name: "wangxiaohu",
           },
           {
             id: 32,
-            date: "2016-05-01",
+            time: "2016-05-01",
             name: "wangxiaohu",
           },
         ]);

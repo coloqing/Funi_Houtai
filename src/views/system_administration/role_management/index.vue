@@ -42,34 +42,49 @@
       :title="dialogType === 'edit' ? 'Edit Role' : 'New Role'"
     >
       <el-form :model="role" label-width="80px" label-position="left">
-        <el-form-item label="Name">
-          <el-input v-model="role.name" placeholder="Role Name" />
+        <el-form-item label="角色昵称">
+          <el-input v-model="role.name" placeholder="请输入角色昵称" />
         </el-form-item>
-        <el-form-item label="Desc">
+        <el-form-item label="权限范围">
           <el-input
-            v-model="role.description"
+            v-model="role.apiIds"
             :autosize="{ minRows: 2, maxRows: 4 }"
             type="textarea"
-            placeholder="Role Description"
+            placeholder="请输入权限范围"
           />
         </el-form-item>
-        <el-form-item label="Menus">
+        <el-form-item label="权限范围">
           <el-tree
             ref="tree"
             :check-strictly="checkStrictly"
             :data="routesData"
+            v-model="checkedKeys"
             :props="defaultProps"
+            @check-change="check_change"
             show-checkbox
-            node-key="path"
+            node-key="name"
             class="permission-tree"
+            :default-checked-keys="checkedKeys"
           />
+          <!-- ref="tree"     设置名称，方便后面使用tree方法
+            v-model="roleForm.roleMenus"   绑定tree结构选中的值，该值要与对应的form-item中的prop的值一样
+            :data="menuList"    用来绑定tree中渲染的值
+            show-checkbox       用来确定节点是否可以选择
+            node-key="id"    用来表示节点的属性，应该是唯一的
+            @check-change="check_change"   节点选中状态发生变化时的回调
+            :props="defaultProps"    用来设置子节点如何展示
+            :default-checked-keys="checkedKeys"    默认勾选的数组 -->
         </el-form-item>
       </el-form>
       <div style="text-align: right">
         <el-button type="danger" @click="dialogVisible = false">
           {{ $t("permission.cancel") }}
         </el-button>
-        <el-button type="primary" @click="confirmRole">
+        <!-- <el-button type="primary" @click="confirmRole"> -->
+        <el-button
+          type="primary"
+          @click="dialogType === 'New Role' ? confirmRole() : confirmEdit()"
+        >
           {{ $t("permission.confirm") }}
         </el-button>
       </div>
@@ -83,19 +98,25 @@ import { deepClone } from "@/utils";
 import {
   getRoutes,
   getRoles,
-  addRole,
+  // addRole,
   deleteRole,
-  updateRole,
+  // updateRole,
 } from "@/api/role";
 import i18n from "@/lang";
 // ali
-import { getRole } from "@/api/system_administration/role_management";
+import {
+  getRole,
+  addRole,
+  updateRole,
+  getApi,
+} from "@/api/system_administration/role_management";
 
 const defaultRole = {
-  key: "",
+  // key: "",
   name: "",
-  description: "",
-  routes: [],
+  apiIds: "",
+  // description: "",
+  // routes: [],
 };
 
 export default {
@@ -109,10 +130,12 @@ export default {
       checkStrictly: false,
       defaultProps: {
         children: "children",
-        label: "title",
+        label: "path",
       },
       //角色列表
-      line_list:null,
+      line_list: null,
+      // 点击修改权限时默认勾选的值
+      checkedKeys: null,
     };
   },
   computed: {
@@ -126,20 +149,48 @@ export default {
     // this.getRoles();
 
     this.getList();
+    this.getApi();
   },
   methods: {
     //ali
     getList(form) {
       this.listLoading = true;
       getRole().then((response) => {
-        console.log("角色列表list:", response);
-        this.line_list = response.data;
-        this.total = response.data.length;
-        this.listLoading = false;
+        if (response.success) {
+          console.log("角色列表list:", response);
+          this.line_list = response.data;
+          this.total = response.data.length;
+          this.listLoading = false;
+        } else {
+          console.error("角色列表接口获取失败");
+        }
+      });
+    },
+    getApi(form) {
+      getApi().then((response) => {
+        if (response.success) {
+          console.log("获取接口url:", response);
+          this.routes = response.data;
+        } else {
+          console.error("获取接口url失败");
+        }
       });
     },
 
     // ali----voer-------
+    // 勾选权限范围
+    check_change() {
+      const checkedNodes = this.$refs.tree.getCheckedNodes();
+      const checkedKeys = checkedNodes.map((node) => node.name); // 假设每个节点的id是唯一标识
+      this.role.apiIds = "";
+      for (let i = 0; i < checkedKeys.length; i++) {
+        if (i !== checkedKeys.length - 1) {
+          this.role.apiIds += checkedKeys[i] + ",";
+        } else {
+          this.role.apiIds += checkedKeys[i];
+        }
+      }
+    },
 
     async getRoutes() {
       const res = await getRoutes();
@@ -218,13 +269,19 @@ export default {
       this.dialogType = "edit";
       this.dialogVisible = true;
       this.checkStrictly = true;
+      // 默认选中
+      let tmp = scope.row.apiIds.split(',')
+      this.checkedKeys = tmp
+
+
+
       this.role = deepClone(scope.row);
-      this.$nextTick(() => {
-        const routes = this.generateRoutes(this.role.routes);
-        this.$refs.tree.setCheckedNodes(this.generateArr(routes));
-        // set checked state of a node not affects its father and child nodes
-        this.checkStrictly = false;
-      });
+      // this.$nextTick(() => {
+      //   const routes = this.generateRoutes(this.role.routes);
+      //   this.$refs.tree.setCheckedNodes(this.generateArr(routes));
+      //   // set checked state of a node not affects its father and child nodes
+      //   this.checkStrictly = false;
+      // });
     },
     handleDelete({ $index, row }) {
       this.$confirm("Confirm to remove the role?", "Warning", {
@@ -268,43 +325,66 @@ export default {
       }
       return res;
     },
+    // 新增角色
     async confirmRole() {
-      const isEdit = this.dialogType === "edit";
-
-      const checkedKeys = this.$refs.tree.getCheckedKeys();
-      this.role.routes = this.generateTree(
-        deepClone(this.serviceRoutes),
-        "/",
-        checkedKeys
-      );
-
-      if (isEdit) {
-        await updateRole(this.role.key, this.role);
-        for (let index = 0; index < this.rolesList.length; index++) {
-          if (this.rolesList[index].key === this.role.key) {
-            this.rolesList.splice(index, 1, Object.assign({}, this.role));
-            break;
-          }
+      addRole(this.role).then((response) => {
+        if (response.success) {
+          console.log("新增角色:", response);
+          this.getList();
+          this.dialogVisible = false;
+        } else {
+          console.error("新增角色失败");
         }
-      } else {
-        const { data } = await addRole(this.role);
-        this.role.key = data.key;
-        this.rolesList.push(this.role);
-      }
+      });
 
-      const { description, key, name } = this.role;
-      this.dialogVisible = false;
-      this.$notify({
-        title: "Success",
-        dangerouslyUseHTMLString: true,
-        message: `
-              <div>Role Key: ${key}</div>
-              <div>Role Name: ${name}</div>
-              <div>Description: ${description}</div>
-            `,
-        type: "success",
+      // const isEdit = this.dialogType === "edit";
+      // const checkedKeys = this.$refs.tree.getCheckedKeys();
+      // this.role.routes = this.generateTree(
+      //   deepClone(this.serviceRoutes),
+      //   "/",
+      //   checkedKeys
+      // );
+
+      // if (isEdit) {
+      //   await updateRole(this.role.key, this.role);
+      //   for (let index = 0; index < this.rolesList.length; index++) {
+      //     if (this.rolesList[index].key === this.role.key) {
+      //       this.rolesList.splice(index, 1, Object.assign({}, this.role));
+      //       break;
+      //     }
+      //   }
+      // } else {
+      //   const { data } = await addRole(this.role);
+      //   this.role.key = data.key;
+      //   this.rolesList.push(this.role);
+      // }
+
+      // const { description, key, name } = this.role;
+      // this.dialogVisible = false;
+      // this.$notify({
+      //   title: "Success",
+      //   dangerouslyUseHTMLString: true,
+      //   message: `
+      //         <div>Role Key: ${key}</div>
+      //         <div>Role Name: ${name}</div>
+      //         <div>Description: ${description}</div>
+      //       `,
+      //   type: "success",
+      // });
+    },
+    // 修改角色
+    async confirmEdit() {
+      updateRole(this.role).then((response) => {
+        if (response.success) {
+          console.log("修改角色:", response);
+          this.getList();
+          this.dialogVisible = false;
+        } else {
+          console.error("修改角色失败");
+        }
       });
     },
+
     // reference: src/view/layout/components/Sidebar/SidebarItem.vue
     onlyOneShowingChild(children = [], parent) {
       let onlyOneChild = null;

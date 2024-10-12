@@ -1,4 +1,4 @@
-import { asyncRoutes, constantRoutes } from '@/router'
+import { asyncRoutes, constantRoutes } from "@/router";
 
 /**
  * Use meta.role to determine if the current user has permission
@@ -7,9 +7,9 @@ import { asyncRoutes, constantRoutes } from '@/router'
  */
 function hasPermission(roles, route) {
   if (route.meta && route.meta.roles) {
-    return roles.some(role => route.meta.roles.includes(role))
+    return roles.some((role) => route.meta.roles.includes(role));
   } else {
-    return true
+    return true;
   }
 }
 
@@ -19,51 +19,69 @@ function hasPermission(roles, route) {
  * @param roles
  */
 export function filterAsyncRoutes(routes, roles) {
-  const res = []
+  console.log('打印路由',routes);
+  console.log('打印roles',roles);
 
-  routes.forEach(route => {
-    const tmp = { ...route }
+  const res = [];
+  //循环每一个路由
+  routes.forEach((route) => {
+    const tmp = { ...route };
+    //判断是否有权限
     if (hasPermission(roles, tmp)) {
+      //判断是否有下限
       if (tmp.children) {
-        tmp.children = filterAsyncRoutes(tmp.children, roles)
+        tmp.children = filterAsyncRoutes(tmp.children, roles);
       }
-      res.push(tmp)
+      res.push(tmp);
     }
-  })
+  });
 
-  return res
+  return res;
 }
 
 const state = {
   routes: [],
-  addRoutes: []
-}
+  addRoutes: [],
+};
 
 const mutations = {
   SET_ROUTES: (state, routes) => {
-    state.addRoutes = routes
-    state.routes = constantRoutes.concat(routes)
-  }
-}
+    state.addRoutes = routes;
+    //把过滤出来有权限的路由议添加到不需要权限的路由
+    state.routes = constantRoutes.concat(routes);
+  },
+};
 
 const actions = {
   generateRoutes({ commit }, roles) {
-    return new Promise(resolve => {
-      let accessedRoutes
-      if (roles.includes('admin')) {
-        accessedRoutes = asyncRoutes || []
-      } else {
-        accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
+    return new Promise((resolve) => {
+      //存的是有权限的路由，是一个数组
+      // console.log("疑是路由信息1",commit);
+      console.log("用户身份",roles);
+      console.log("路由信息",asyncRoutes);
+      let accessedRoutes;
+      //这里可以写自己的拦截逻辑
+      if (roles.includes("admin")) {
+        accessedRoutes = asyncRoutes || [];
       }
-      commit('SET_ROUTES', accessedRoutes)
-      resolve(accessedRoutes)
-    })
-  }
-}
+      //  else if(roles.includes('doctor')){
+      //   //通过所属的角色去过滤路由，生成新的路由表
+      //   accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
+      // }
+       else {
+        accessedRoutes = filterAsyncRoutes(asyncRoutes, roles);
+      }
+      // 当前路由信息
+      console.log('当前路由信息',accessedRoutes);
+      commit("SET_ROUTES", accessedRoutes);
+      resolve(accessedRoutes);
+    });
+  },
+};
 
 export default {
   namespaced: true,
   state,
   mutations,
-  actions
-}
+  actions,
+};

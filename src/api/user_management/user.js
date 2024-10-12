@@ -42,6 +42,7 @@ export function getRole(data) {
   return request({
     url: '/api/Role',
     method: 'get',
+    params:data
   })
 }
 // 修改用户角色身份

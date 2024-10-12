@@ -47,7 +47,7 @@
         </el-form-item>
         <el-form-item label="权限范围">
           <el-input
-            v-model="role.apiIds"
+            v-model="role_apiName"
             :autosize="{ minRows: 2, maxRows: 4 }"
             type="textarea"
             placeholder="请输入权限范围"
@@ -130,12 +130,14 @@ export default {
       checkStrictly: false,
       defaultProps: {
         children: "children",
-        label: "path",
+        label: "name",
       },
       //角色列表
       line_list: null,
       // 点击修改权限时默认勾选的值
       checkedKeys: null,
+      // 显示的权限范围
+      role_apiName:'',
     };
   },
   computed: {
@@ -144,10 +146,6 @@ export default {
     },
   },
   created() {
-    // Mock: get all routes and roles list from server
-    // this.getRoutes();
-    // this.getRoles();
-
     this.getList();
     this.getApi();
   },
@@ -181,13 +179,16 @@ export default {
     // 勾选权限范围
     check_change() {
       const checkedNodes = this.$refs.tree.getCheckedNodes();
-      const checkedKeys = checkedNodes.map((node) => node.name); // 假设每个节点的id是唯一标识
+      const checkedKeys = checkedNodes.map((node) => [node.id,node.name]); // 假设每个节点的id是唯一标识
       this.role.apiIds = "";
+      this.role_apiName = "";
       for (let i = 0; i < checkedKeys.length; i++) {
         if (i !== checkedKeys.length - 1) {
-          this.role.apiIds += checkedKeys[i] + ",";
+          this.role.apiIds += checkedKeys[i][0] + ",";
+          this.role_apiName += checkedKeys[i][1] + ",";
         } else {
-          this.role.apiIds += checkedKeys[i];
+          this.role.apiIds += checkedKeys[i][0];
+          this.role_apiName += checkedKeys[i][1];
         }
       }
     },

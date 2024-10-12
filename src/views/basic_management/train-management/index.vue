@@ -1,11 +1,11 @@
 <template>
   <div class="app-container lin_management">
-    <div class="filter-container" >
+    <div class="filter-container">
       <el-form :inline="true">
-        <el-form-item label="列车线路">
+        <el-form-item label="线路">
           <el-input
-            v-model="form.xianlu"
-            placeholder="线路"
+            v-model="form.lineId"
+            placeholder="请输入线路"
             style="width: 200px; margin-right: 10px"
             class="filter-item"
             @keyup.enter.native="handleFilter"
@@ -13,7 +13,7 @@
         </el-form-item>
         <el-form-item label="列车号">
           <el-input
-            v-model="form.liechehao"
+            v-model="form.name"
             placeholder="列车号"
             style="width: 200px; margin-right: 10px"
             class="filter-item"
@@ -59,7 +59,7 @@
       v-loading="listLoading"
       :data="train_list"
       border
-      :header-cell-style="{ backgroundColor: 'rgb(244, 243, 249)' }" 
+      :header-cell-style="{ backgroundColor: 'rgb(244, 243, 249)' }"
       fit
       highlight-current-row
       style="width: 100%"
@@ -68,7 +68,6 @@
       <el-table-column
         label="ID"
         prop="id"
-        sortable="custom"
         align="center"
         min-width="80"
         :class-name="getSortClass('id')"
@@ -79,12 +78,12 @@
       </el-table-column>
       <el-table-column label="线路" min-width="110px" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.xianlu }}</span>
+          <span>{{ row.lineId }}</span>
         </template>
       </el-table-column>
       <el-table-column label="列车号" min-width="80px" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.liechehao }}</span>
+          <span>{{ row.name }}</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -100,7 +99,7 @@
             type="primary"
             @click=""
           >
-            <router-link to="/line-management/carriage">修改列车</router-link>
+            <router-link to="/basic_management/carriage">修改列车</router-link>
           </el-button>
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             修改
@@ -134,12 +133,29 @@
         label-width="70px"
         style="width: 400px; margin-left: 50px"
       >
-        <el-form-item label="线路" prop="title" label-width="100px" >
-          <el-input v-model="temps.xianlu" placeholder="请输入线路号" />
+        <!-- <el-form-item label="线路" prop="title" label-width="100px">
+          <el-input v-model="temps.lineId" placeholder="请输入线路号" />
+        </el-form-item> -->
+
+        <el-form-item label="线路" label-width="100px">
+          <el-select
+            v-model="temps.lineId"
+            clearable
+            placeholder="请选择列车号"
+          >
+            <el-option
+              v-for="item in line_list"
+              :key="item.lineId"
+              :label="item.name"
+              :value="item.lineId"
+            >
+            </el-option>
+          </el-select>
         </el-form-item>
-        <el-form-item label="列车号" label-width="100px" >
-          <el-input v-model="temps.liechehao" placeholder="请输入列车号"/>
+        <el-form-item label="列车号" label-width="100px">
+          <el-input v-model="temps.name" placeholder="请输入列车号" />
         </el-form-item>
+
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
@@ -154,11 +170,10 @@
       </div>
     </el-dialog>
 
-    <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics" >
+    <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
       <el-table
         :data="pvData"
         border
-        
         fit
         highlight-current-row
         style="width: 100%"
@@ -182,10 +197,15 @@ import {
   createArticle,
   updateArticle,
 } from "@/api/article";
+
+import { getTrain,createTrain,Update } from "@/api/basic_management/train-management";
+
+import { Lines } from "@/api/basic_management/line-management";
 import waves from "@/directive/waves"; // waves directive
 import { parseTime } from "@/utils";
 import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
 import { pcTextArr } from "element-china-area-data";
+
 const calendarTypeOptions = [
   { key: "CN", display_name: "China" },
   { key: "US", display_name: "USA" },
@@ -224,33 +244,32 @@ export default {
 
       tableKey: 0,
       train_list: [
-        {id:'1',xianlu:'G10001',liechehao:'10001'},
-        {id:'2',xianlu:'G10001',liechehao:'10001'},
-        {id:'3',xianlu:'G10001',liechehao:'10001'},
-        {id:'4',xianlu:'G10001',liechehao:'10001'}
+        { id: "1", lineId: "G10001", name: "10001" },
+        { id: "2", lineId: "G10001", name: "10001" },
+        { id: "3", lineId: "G10001", name: "10001" },
+        { id: "4", lineId: "G10001", name: "10001" },
       ],
+      line_list: null,
       total: 4,
       listLoading: true,
       // 查询的表单
-      form:{
-        xianlu:'',
-        liechehao:''
+      form: {
+        lineId: "",
+        name: "",
       },
       // 新增/修改 表单
-      temps:{
-        xianlu:'',
-        liechehao:''
+      temps: {
+        lineId: "",
+        name: "",
       },
 
-// =============================
-
-
+      // =============================
 
       listQuery: {
         page: 1,
         limit: 10,
         importance: undefined,
-        title: '',
+        title: "",
         type: undefined,
         sort: "+id",
       },
@@ -296,20 +315,29 @@ export default {
   },
   created() {
     this.getList();
+    this.getLines();
   },
   methods: {
     getList() {
-      // this.listLoading = true;
-      // fetchList(this.listQuery).then((response) => {
-      //   this.list = response.data.items;
-      //   this.total = response.data.total;
-      //   this.listLoading = false;
-      // });
+      this.listLoading = true;
+      getTrain(this.form).then((response) => {
+        this.train_list = response.data;
+        this.total = response.data.length;
+        this.listLoading = false;
+      });
       this.listLoading = false;
+    },
+    // 获取所有线路
+    getLines() {
+      Lines().then((response) => {
+        console.log("线路信息", response);
+        this.line_list = response.data;
+      });
     },
     handleFilter() {
       this.listQuery.page = 1;
       this.getList();
+      console.log("我要进行查询");
     },
     handleModifyStatus(row, status) {
       this.$message({
@@ -332,19 +360,26 @@ export default {
       }
       this.handleFilter();
     },
-    resetTemp() {
-      this.temp = {
-        id: undefined,
-        importance: 1,
-        remark: "",
-        timestamp: new Date(),
-        title: "",
-        status: "published",
-        type: "",
-      };
+    // 清除表单
+    resetTemps() {
+      this.temps = {
+        lineId: "",
+        name: "",
+      }
     },
+    // resetTemp() {
+    //   this.temp = {
+    //     id: undefined,
+    //     importance: 1,
+    //     remark: "",
+    //     timestamp: new Date(),
+    //     title: "",
+    //     status: "published",
+    //     type: "",
+    //   };
+    // },
     handleCreate() {
-      this.resetTemp();
+      this.resetTemps();
       this.dialogStatus = "create";
       this.dialogFormVisible = true;
       this.$nextTick(() => {
@@ -354,10 +389,12 @@ export default {
     createData() {
       this.$refs["dataForm"].validate((valid) => {
         if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024; // mock a id
-          this.temp.author = "vue-element-admin";
-          createArticle(this.temp).then(() => {
-            this.list.unshift(this.temp);
+          // this.temp.id = parseInt(Math.random() * 100) + 1024; // mock a id
+          // this.temp.author = "vue-element-admin";
+          createTrain(this.temps).then((res) => {
+            // this.list.unshift(this.temp);
+            this.getList();
+            console.log('新增列车',res);
             this.dialogFormVisible = false;
             this.$notify({
               title: "成功",
@@ -370,22 +407,15 @@ export default {
       });
     },
     handleUpdate(row) {
-      this.temp = Object.assign({}, row); // copy obj
-      this.temp.timestamp = new Date(this.temp.timestamp);
+      this.temps = Object.assign({}, row); // copy obj
       this.dialogStatus = "update";
       this.dialogFormVisible = true;
-      this.$nextTick(() => {
-        this.$refs["dataForm"].clearValidate();
-      });
     },
     updateData() {
       this.$refs["dataForm"].validate((valid) => {
         if (valid) {
-          const tempData = Object.assign({}, this.temp);
-          tempData.timestamp = +new Date(tempData.timestamp); // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          updateArticle(tempData).then(() => {
-            const index = this.list.findIndex((v) => v.id === this.temp.id);
-            this.list.splice(index, 1, this.temp);
+          Update(this.temps).then(() => {
+            this.getList()
             this.dialogFormVisible = false;
             this.$notify({
               title: "成功",
@@ -413,24 +443,26 @@ export default {
       });
     },
     handleDownload() {
-      this.downloadLoading = true;
-      import("@/vendor/Export2Excel").then((excel) => {
-        const tHeader = ["timestamp", "title", "type", "importance", "status"];
-        const filterVal = [
-          "timestamp",
-          "title",
-          "type",
-          "importance",
-          "status",
-        ];
-        const data = this.formatJson(filterVal);
-        excel.export_json_to_excel({
-          header: tHeader,
-          data,
-          filename: "table-list",
-        });
-        this.downloadLoading = false;
-      });
+      this.form = {}
+      this.getList();
+      // this.downloadLoading = true;
+      // import("@/vendor/Export2Excel").then((excel) => {
+      //   const tHeader = ["timestamp", "title", "type", "importance", "status"];
+      //   const filterVal = [
+      //     "timestamp",
+      //     "title",
+      //     "type",
+      //     "importance",
+      //     "status",
+      //   ];
+      //   const data = this.formatJson(filterVal);
+      //   excel.export_json_to_excel({
+      //     header: tHeader,
+      //     data,
+      //     filename: "table-list",
+      //   });
+      //   this.downloadLoading = false;
+      // });
     },
     formatJson(filterVal) {
       return this.list.map((v) =>

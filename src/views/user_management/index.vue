@@ -20,6 +20,15 @@
             @keyup.enter.native="handleFilter"
           />
         </el-form-item>
+        <!-- <el-form-item label="用户id">
+          <el-input
+            v-model="form.id"+
+            placeholder="请输入用户id"
+            style="width: 200px; margin-right: 10px"
+            class="filter-item"
+            @keyup.enter.native="handleFilter"
+          />
+        </el-form-item> -->
         <!-- 功能按钮 -->
         <el-form-item>
           <el-button
@@ -91,9 +100,9 @@
           <span>{{ row.phone === null ? "--" : row.phone }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" min-width="80px" align="center">
+      <el-table-column label="创建时间" min-width="100px" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.createdTime | parseTime("{y}-{m}-{d} {h}:{i}") }}</span>
+          <span>{{ row.createTime | parseTime("{y}-{m}-{d} {h}:{i}") }}</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -417,18 +426,31 @@ export default {
   },
   methods: {
     // 获取用户数据列表
-    getList() {
+    getList(data) {
       this.listLoading = true;
-      fetchList().then((response) => {
-        if (response.code === 200) {
-          // this.list = response.data;
-          this.user_list = response.data;
-          this.total = response.data.length;
-          this.listLoading = false;
-        } else {
-          console.err("获取用户数据接口执行失败");
-        }
-      });
+      if (data) {
+        fetchList(data).then((response) => {
+          if (response.code === 200) {
+            // this.list = response.data;
+            this.user_list = response.data;
+            this.total = response.data.length;
+            this.listLoading = false;
+          } else {
+            console.err("获取用户数据接口执行失败");
+          }
+        });
+      }else{
+        fetchList().then((response) => {
+          if (response.code === 200) {
+            // this.list = response.data;
+            this.user_list = response.data;
+            this.total = response.data.length;
+            this.listLoading = false;
+          } else {
+            console.err("获取用户数据接口执行失败");
+          }
+        });
+      }
       // this.listLoading = false;
     },
     // 获取系统角色列表
@@ -443,7 +465,7 @@ export default {
     },
     handleFilter() {
       this.listQuery.page = 1;
-      this.getList();
+      this.getList(this.form);
     },
     handleModifyStatus(row, status) {
       this.$message({

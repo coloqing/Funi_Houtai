@@ -1,32 +1,7 @@
 <template>
   <div class="app-container">
-    <!-- 搜索 -->
+    <!-- 新增 -->
     <div class="filter-container" style="display: flex; align-items: baseline">
-      <!-- 线路 -->
-      <el-input
-        v-model="from.title"
-        placeholder="线路"
-        style="width: 200px; margin-right: 10px"
-        class="filter-item"
-        @keyup.enter.native=""
-      />
-      <!-- 列车号 -->
-      <el-input
-        v-model="from.Options"
-        placeholder="列车号"
-        style="width: 200px; margin-right: 10px"
-        class="filter-item"
-        @keyup.enter.native=""
-      />
-
-      <el-button
-        class="filter-item"
-        type="primary"
-        icon="el-icon-search"
-        @click=""
-      >
-        {{ $t("table.search") }}
-      </el-button>
       <el-button
         class="filter-item"
         style="margin-left: 10px"
@@ -76,7 +51,7 @@
       </el-table-column>
     </el-table>
     <!-- 弹出层 -->
-    <el-dialog title="修改" :visible.sync="dialogVisible">
+    <el-dialog :title="dialogStatus" :visible.sync="dialogVisible">
       <el-form
         ref="dataForm"
         :rules="rules"
@@ -85,22 +60,24 @@
         label-width="70px"
         style="width: 400px; margin-left: 50px"
       >
-        <el-form-item label="线路" prop="title" label-width="100px">
-          <el-input v-model="temps.xianlu" placeholder="请输入线路号" />
+        <el-form-item label="组织昵称" prop="name" label-width="100px">
+          <el-input v-model="temps.name" placeholder="请输入组织昵称" />
         </el-form-item>
 
-        <el-form-item label="上级菜单" prop="parentId"  label-width="100px">
+        <el-form-item label="上级菜单" prop="parentId" label-width="100px">
           <el-cascader
-            v-model="id"
+            v-model="selectedLeafNode"
             :options="tableData"
-            :props="{value: 'id', label: 'name' }"
+            :props="{ checkStrictly: true ,value: 'id', label: 'name' }"
             @change="handleChange"
-            style="width: 100%;" 
+            style="width: 100%"
           ></el-cascader>
         </el-form-item>
-        <el-form-item label="列车号" label-width="100px">
-          <el-input v-model="temps.liechehao" placeholder="请输入列车号" />
+        <el-form-item label="排序" prop="order" label-width="100px">
+          <el-input v-model="temps.order" placeholder="请排序" />
         </el-form-item>
+
+
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">
@@ -108,7 +85,7 @@
         </el-button>
         <el-button
           type="primary"
-          @click="dialogStatus === 'create' ? createData() : updateData()"
+          @click="dialogStatus === 'new' ? createData() : updateData()"
         >
           {{ $t("table.confirm") }}
         </el-button>
@@ -118,11 +95,15 @@
 </template>
 
 <script>
-import { getOrgStructure } from "@/api/system_administration/organizational_management";
+import { getOrgStructure,createOrgStructure,Update } from "@/api/system_administration/organizational_management";
 export default {
   data() {
     return {
-      a: null,
+      // a: null,
+      // 被选中的下拉菜单
+      selectedLeafNode:null,
+      // 新增 修改 title
+      dialogStatus:null,
       // 表格数据
       tableData: [
         {
@@ -164,8 +145,9 @@ export default {
       from: {},
       // 新增/修改 表单
       temps: {
-        xianlu: "",
-        liechehao: "",
+        name: "",
+        parentId: null,
+        order:0
       },
       rules: {
         type: [{ required: true, message: "请输入省市", trigger: "change" }],
@@ -184,7 +166,7 @@ export default {
         },
       },
       textMap: "",
-      // dialogFormVisible: false,
+      // dialogVisible: false,
       dialogType: null,
       dialogVisible: false,
       // 下拉框 菜单树选项
@@ -200,12 +182,13 @@ export default {
     this.getList();
   },
   methods: {
+    // 查询
     getList(form) {
       this.listLoading = true;
       getOrgStructure().then((response) => {
         if (response.success) {
           console.log("组织结构管理list:", response);
-          this.tableData = [response.data];
+          this.tableData = response.data;
           // this.total = response.data.length;
           this.listLoading = false;
         } else {
@@ -215,24 +198,55 @@ export default {
     },
     // 点击新增
     handleAddRole() {
-      // this.role = Object.assign({}, defaultRole);
-      // if (this.$refs.tree) {
-      //   this.$refs.tree.setCheckedNodes([]);
-      // }
-      this.dialogType = "new";
+      this.dialogStatus = "new";
       this.dialogVisible = true;
+      this.reset_temps()
+      this.selectedLeafNode = null
     },
     // 新增
     createData() {
       this.$refs["dataForm"].validate((valid) => {
         if (valid) {
-          addLines(this.temps).then((res) => {
+          if(this.temps.parentId === null){
+            this.temps.parentId = 0
+          }
+          createOrgStructure(this.temps).then((res) => {
             console.log("新增部门", res);
             this.getList();
-            this.dialogFormVisible = false;
+            this.dialogVisible = false;
             this.$notify({
               title: "成功",
               message: "创建成功",
+              type: "success",
+              duration: 2000,
+            });
+            this.reset_temps()
+          });
+        }
+      });
+    },
+    // 点击修改
+    handleUpdate(row) {
+      this.temps = Object.assign({}, row); // copy obj
+      // let tmp = this.temps.province;
+      // this.temps.province = [tmp, this.temps.city];
+      // this.temp.timestamp = new Date(this.temp.timestamp);
+      console.log("操作的对象", this.temps);
+      this.dialogStatus = "update";
+      this.dialogVisible = true;
+
+    },
+    // 修改
+    updateData(){
+      this.$refs["dataForm"].validate((valid) => {
+        if (valid) {
+          Update(this.temps).then((res) => {
+            console.log("修改部门", res);
+            this.getList();
+            this.dialogVisible = false;
+            this.$notify({
+              title: "成功",
+              message: "修改成功",
               type: "success",
               duration: 2000,
             });
@@ -240,6 +254,21 @@ export default {
         }
       });
     },
+    // 上级菜单选择
+    handleChange(value){
+      this.temps.parentId = value[value.length-1]
+      console.log('当前选中的值id:',this.temps.parentId);
+    },
+    // 重置temps
+    reset_temps(){
+      this.temps = {
+        name: "",
+        parentId: null,
+        order:0
+      }
+    },
+
+
 
     load(tree, treeNode, resolve) {
       setTimeout(() => {

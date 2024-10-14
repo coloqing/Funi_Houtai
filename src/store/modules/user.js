@@ -1,15 +1,15 @@
 import { login, logout, getInfo } from "@/api/user";
 import { getToken, setToken, removeToken } from "@/utils/auth";
 import router, { resetRouter } from "@/router";
-
+import Cookies from 'js-cookie'
 const state = {
   token: getToken(),
   name: "",
   avatar: "",
   introduction: "",
   roles: [],
+  id:''
 };
-
 const mutations = {
   SET_TOKEN: (state, token) => {
     state.token = token;
@@ -26,6 +26,9 @@ const mutations = {
   SET_ROLES: (state, roles) => {
     state.roles = roles;
   },
+  SET_ID: (state, roles) => {
+    state.id = roles;
+  },
 };
 
 const actions = {
@@ -36,14 +39,16 @@ const actions = {
       login({ username: username.trim(), password: password })
         .then((response) => {
           // 打印登录数据
-          console.log("打印登录信息", response.data.token);
+          console.log("打印登录信息", response.data);
           console.log("打印登录信息type", response.data.token_type);
           let token = `${response.data.token_type} ${response.data.token}`;
           console.log("完整的token", token);
           commit("SET_TOKEN", token);
+          commit('SET_ID', response.data.user_id);
+          Cookies.set('userId', response.data.user_id, { expires: 7 });
+          // user_id = response.user_id
           setToken(token);
           // const { data } = response
-          // commit('SET_TOKEN', data.token)
           // setToken(data.token)
           resolve();
         })
@@ -52,7 +57,6 @@ const actions = {
         });
     });
   },
-
   // get user info
   // 静态获取用户数据
   // getInfo({ commit, state }) {
@@ -95,7 +99,7 @@ const actions = {
   // 动态获取用户数据
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
-      getInfo(2)
+      getInfo(state.id || Cookies.get('userId'))
         .then((response) => {
           console.log("获取用户数据", response.data);
           const data = response.data;
@@ -104,7 +108,6 @@ const actions = {
           // if (!data) {
           //   reject('Verification failed, please Login again.')
           // }
-
           // const { roles, name, avatar, introduction } = data
 
           // roles must be a non-empty array
@@ -116,6 +119,7 @@ const actions = {
           commit("SET_NAME", data.name);
           commit("SET_AVATAR", data.avatar);
           commit("SET_INTRODUCTION", data.introduction);
+          commit("SET_ID", data.id);
           resolve(data);
         })
         .catch((error) => {
@@ -171,6 +175,8 @@ const actions = {
     const accessRoutes = await dispatch("permission/generateRoutes", roles, {
       root: true,
     });
+    // 添加到路由表
+    console.log('添加路由到router',accessRoutes);
     // dynamically add accessible routes
     router.addRoutes(accessRoutes);
 

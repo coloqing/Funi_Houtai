@@ -19,9 +19,6 @@ function hasPermission(roles, route) {
  * @param roles
  */
 export function filterAsyncRoutes(routes, roles) {
-  console.log('打印路由',routes);
-  console.log('打印roles',roles);
-
   const res = [];
   //循环每一个路由
   routes.forEach((route) => {
@@ -40,7 +37,9 @@ export function filterAsyncRoutes(routes, roles) {
 }
 
 const state = {
+  // 完整的路由表
   routes: [],
+  // 用户可以访问的路由
   addRoutes: [],
 };
 
@@ -49,6 +48,11 @@ const mutations = {
     state.addRoutes = routes;
     //把过滤出来有权限的路由议添加到不需要权限的路由
     state.routes = constantRoutes.concat(routes);
+    // state.routes = [];
+
+    // 用户身份 和 路由信息
+    console.log('用户身份 和 路由信息',state);
+
   },
 };
 
@@ -56,12 +60,12 @@ const actions = {
   generateRoutes({ commit }, roles) {
     return new Promise((resolve) => {
       //存的是有权限的路由，是一个数组
-      // console.log("疑是路由信息1",commit);
       console.log("用户身份",roles);
       console.log("路由信息",asyncRoutes);
       let accessedRoutes;
       //这里可以写自己的拦截逻辑
-      if (roles.includes("admin")) {
+      // if (roles.includes("admin")) {
+      if (true) {
         accessedRoutes = asyncRoutes || [];
       }
       //  else if(roles.includes('doctor')){
@@ -71,8 +75,7 @@ const actions = {
        else {
         accessedRoutes = filterAsyncRoutes(asyncRoutes, roles);
       }
-      // 当前路由信息
-      console.log('当前路由信息',accessedRoutes);
+      // commit("SET_ROUTES", accessedRoutes);
       commit("SET_ROUTES", accessedRoutes);
       resolve(accessedRoutes);
     });

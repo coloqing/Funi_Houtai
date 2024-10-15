@@ -1,5 +1,6 @@
 import { asyncRoutes, constantRoutes } from "@/router";
-
+/* Layout */
+import Layout from "@/layout";
 /**
  * Use meta.role to determine if the current user has permission
  * @param roles
@@ -55,6 +56,10 @@ const mutations = {
 
   },
 };
+// 路由菜单
+const arrxx = [
+  {a:() => import("@/views/clipboard/index")}
+]
 
 const actions = {
   generateRoutes({ commit }, roles) {
@@ -66,7 +71,20 @@ const actions = {
       //这里可以写自己的拦截逻辑
       // if (roles.includes("admin")) {
       if (true) {
-        accessedRoutes = asyncRoutes || [];
+        // accessedRoutes = asyncRoutes || [];
+        accessedRoutes = [
+          {
+            path: "/clipboard",
+            component: Layout,
+            children: [
+              {
+                path: "index",
+                component: arrxx[0].a,
+                // name: "ClipboardDemo",
+                meta: { title: "clipboardDemo", icon: "clipboard" },
+              },
+            ],
+          }];
       }
       //  else if(roles.includes('doctor')){
       //   //通过所属的角色去过滤路由，生成新的路由表
@@ -88,3 +106,4 @@ export default {
   mutations,
   actions,
 };
+

@@ -55,34 +55,34 @@
     </div>
     <el-table :data="tableData" :header-cell-style="{ backgroundColor: 'rgb(244, 243, 249)' }"  style="width: 100%" border>
       <el-table-column prop="id" label="ID" min-width="100" align="center" ></el-table-column>
-      <el-table-column prop="line" label="线路" width="180" align="center" >
+      <el-table-column prop="lineName" label="线路" width="180" align="center" >
         <template slot-scope="scope">
           <el-input
             v-if="scope.row.editable"
-            v-model="scope.row.line"
-            @blur="handleBlur(scope.$index, 'line')"
+            v-model="scope.row.lineName"
+            @blur="handleBlur(scope.$index, 'lineName')"
           ></el-input>
-          <span v-else>{{ scope.row.line }}</span>
+          <span v-else>{{ scope.row.lineName }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="trainNumber" label="列车号" min-width="180" align="center" >
+      <el-table-column prop="trainNum" label="列车号" min-width="180" align="center" >
         <template slot-scope="scope">
           <el-input
             v-if="scope.row.editable"
-            v-model="scope.row.trainNumber"
-            @blur="handleBlur(scope.$index, 'trainNumber')"
+            v-model="scope.row.trainNum"
+            @blur="handleBlur(scope.$index, 'trainNum')"
           ></el-input>
-          <span v-else>{{ scope.row.trainNumber }}</span>
+          <span v-else>{{ scope.row.trainNum }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="carNumber" label="车厢号" min-width="180" align="center" >
+      <el-table-column prop="name" label="车厢号" min-width="180" align="center" >
         <template slot-scope="scope">
           <el-input
             v-if="scope.row.editable"
-            v-model="scope.row.carNumber"
-            @blur="handleBlur(scope.$index, 'carNumber')"
+            v-model="scope.row.name"
+            @blur="handleBlur(scope.$index, 'name')"
           ></el-input>
-          <span v-else>{{ scope.row.carNumber }}</span>
+          <span v-else>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" min-width="240" align="center" >
@@ -114,8 +114,8 @@
     <pagination
       v-show="total > 0"
       :total="total"
-      :page.sync="listQuery.page"
-      :limit.sync="listQuery.limit"
+      :pageIndex.sync="listQuery.pageIndex"
+      :pageRow.sync="listQuery.pageRow"
       @pagination="getList"
     />
 
@@ -155,11 +155,16 @@
 
 <script>
 import {
-  fetchList,
+  // fetchList,
   fetchPv,
   createArticle,
   updateArticle,
 } from "@/api/article";
+import {
+  getList,
+} from "@/api/basic_management/carriage-management";
+
+
 import waves from "@/directive/waves"; // waves directive
 import { parseTime } from "@/utils";
 import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
@@ -211,23 +216,23 @@ export default {
       tableData: [
         {
           id: 1,
-          line: "线路1",
-          trainNumber: "T101",
-          carNumber: "01",
+          lineName: "线路1",
+          trainNum: "T101",
+          name: "01",
           editable: false,
         },
         {
           id: 1,
-          line: "线路1",
-          trainNumber: "T101",
-          carNumber: "01",
+          lineName: "线路1",
+          trainNum: "T101",
+          name: "01",
           editable: false,
         },
         {
           id: 1,
-          line: "线路1",
-          trainNumber: "T101",
-          carNumber: "01",
+          lineName: "线路1",
+          trainNum: "T101",
+          name: "01",
           editable: false,
         },
         // 其他数据项...
@@ -254,12 +259,12 @@ export default {
       // ----------------------------------------
 
       listQuery: {
-        page: 1,
-        limit: 10,
-        importance: undefined,
-        title: undefined,
-        type: undefined,
-        sort: "+id",
+        pageIndex: 1,
+        pageRow: 10,
+        // importance: undefined,
+        // title: undefined,
+        // type: undefined,
+        // sort: "+id",
       },
       importanceOptions: [1, 2, 3],
       calendarTypeOptions,
@@ -331,16 +336,16 @@ export default {
     // ==================================
 
     getList() {
-      // this.listLoading = true;
-      // fetchList(this.listQuery).then((response) => {
-      //   this.list = response.data.items;
-      //   this.total = response.data.total;
-      //   this.listLoading = false;
-      // });
+      this.listLoading = true;
+      getList(this.listQuery).then((response) => {
+        this.tableData = response.data;
+        this.total = response.total;
+        this.listLoading = false;
+      });
         this.listLoading = false;
     },
     handleFilter() {
-      this.listQuery.page = 1;
+      this.listQuery.pageIndex = 1;
       this.getList();
     },
     handleModifyStatus(row, status) {

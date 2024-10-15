@@ -13,7 +13,7 @@
         </el-form-item>
         <el-form-item label="列车号">
           <el-input
-            v-model="form.liechehao"
+            v-model="form.name"
             placeholder="列车号"
             style="width: 200px; margin-right: 10px"
             class="filter-item"
@@ -59,7 +59,7 @@
       v-loading="listLoading"
       :data="parts_list"
       border
-      :header-cell-style="{ backgroundColor: 'rgb(244, 243, 249)' }" 
+      :header-cell-style="{ backgroundColor: 'rgb(244, 243, 249)' }"
       fit
       highlight-current-row
       style="width: 100%"
@@ -79,12 +79,12 @@
       </el-table-column>
       <el-table-column label="设备编码" min-width="110px" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.encode }}</span>
+          <span>{{ row.coachType }}</span>
         </template>
       </el-table-column>
       <el-table-column label="列车号" min-width="110px" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.liechehao }}</span>
+          <span>{{ row.name }}</span>
         </template>
       </el-table-column>
       <el-table-column label="线网名称" min-width="110px" align="center">
@@ -104,12 +104,12 @@
       </el-table-column>
       <el-table-column label="线路名称" min-width="80px" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.xianlname }}</span>
+          <span>{{ row.lineName }}</span>
         </template>
       </el-table-column>
       <el-table-column label="车品类型" min-width="80px" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.leix }}</span>
+          <span>{{ row.sn }}</span>
         </template>
       </el-table-column>
       <el-table-column label="车厢号" min-width="80px" align="center">
@@ -120,19 +120,16 @@
       <el-table-column label="列车类型" min-width="80px" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.lieleix }}</span>
-
         </template>
       </el-table-column>
       <el-table-column label="机组数量" min-width="80px" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.jizsl }}</span>
-
+          <span>{{ row.trainNum }}</span>
         </template>
       </el-table-column>
       <el-table-column label="空调类型" min-width="80px" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.ktiaoleix }}</span>
-
         </template>
       </el-table-column>
       <el-table-column
@@ -160,8 +157,8 @@
     <pagination
       v-show="total > 0"
       :total="total"
-      :page.sync="listQuery.page"
-      :limit.sync="listQuery.limit"
+      :pageIndex.sync="listQuery.pageIndex"
+      :pageRow.sync="listQuery.pageRow"
       @pagination="getList"
     />
 
@@ -174,27 +171,27 @@
         label-width="70px"
         style="width: 400px; margin-left: 50px"
       >
-        <el-form-item label="设备编码" prop="title" label-width="100px" >
-          <el-input v-model="temp.bma" placeholder="请输入设备编码" />
+        <el-form-item label="设备编码" prop="coachType" label-width="100px">
+          <el-input v-model="temp.coachType" placeholder="请输入设备编码" />
         </el-form-item>
-        <el-form-item label="网线名称" label-width="100px" >
-          <el-input v-model="temp.wxian" placeholder="请输入网线名称" />
+        <el-form-item label="列车号" label-width="100px">
+          <el-input v-model="temp.name" placeholder="请输入网线名称" />
         </el-form-item>
-        <el-form-item label="线路名称" label-width="100px" >
-          <el-input v-model="temp.xlu" placeholder="请输入网线名称" />
+        <el-form-item label="线路名称" label-width="100px">
+          <el-input v-model="temp.lineName" placeholder="请输入网线名称" />
         </el-form-item>
-        <el-form-item label="车品类型" label-width="100px" >
-          <el-input v-model="temp.cping" placeholder="请输入车品类型" />
+        <el-form-item label="车品类型" label-width="100px">
+          <el-input v-model="temp.sn" placeholder="请输入车品类型" />
         </el-form-item>
-        <el-form-item label="列车类型" label-width="100px" >
+        <!-- <el-form-item label="列车类型" label-width="100px" >
           <el-input v-model="temp.lcleix" placeholder="请输入列车类型" />
+        </el-form-item> -->
+        <el-form-item label="机组数量" label-width="100px">
+          <el-input v-model="temp.trainNum" placeholder="请输入机组数量" />
         </el-form-item>
-        <el-form-item label="机组数量" label-width="100px" >
-          <el-input v-model="temp.jz" placeholder="请输入机组数量" />
-        </el-form-item>
-        <el-form-item label="空调类型" label-width="100px" >
+        <!-- <el-form-item label="空调类型" label-width="100px" >
           <el-input v-model="temp.ktiao" placeholder="请输入空调类型" />
-        </el-form-item>
+        </el-form-item> -->
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
@@ -213,7 +210,6 @@
       <el-table
         :data="pvData"
         border
-
         fit
         highlight-current-row
         style="width: 100%"
@@ -232,22 +228,21 @@
 
 <script>
 import {
-  fetchList,
+  // fetchList,
   fetchPv,
   createArticle,
   updateArticle,
 } from "@/api/article";
+import {
+  fetchList,
+  createList,
+  Update,
+  Delete,
+} from "@/api/basic_management/parts-management";
+
 import waves from "@/directive/waves"; // waves directive
 import { parseTime } from "@/utils";
 import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
-// 地址选择器
-// import {
-//   provinceAndCityData,
-//   pcTextArr,
-//   regionData,
-//   pcaTextArr,
-//   codeToText,
-// } from "element-china-area-data";
 import { pcTextArr } from "element-china-area-data";
 const calendarTypeOptions = [
   { key: "CN", display_name: "China" },
@@ -288,81 +283,64 @@ export default {
       tableKey: 0,
       parts_list: [
         {
-          id:'1',
-          encode:'end',
-          liechehao:'G100001',
-          wlname:'wlx',
-          xianlname:'10001',
-          leix:'1',
-          chexhao:'01',
-          lieleix:'A',
-          jizsl:'2',
-          ktiaoleix:'M'
-        },
-        {
-          id:'2',
-          encode:'end',
-          liechehao:'G100001',
-          wlname:'wlx',
-          xianlname:'10001',
-          leix:'1',
-          chexhao:'01',
-          lieleix:'A',
-          jizsl:'2',
-          ktiaoleix:'M'
-        },
-        {
-          id:'3',
-          encode:'end',
-          liechehao:'G100001',
-          wlname:'wlx',
-          xianlname:'10001',
-          leix:'1',
-          chexhao:'01',
-          lieleix:'A',
-          jizsl:'2',
-          ktiaoleix:'M'
-        },
-        {
-          id:'4',
-          encode:'end',
-          liechehao:'G100001',
-          wlname:'wlx',
-          xianlname:'10001',
-          leix:'1',
-          chexhao:'01',
-          lieleix:'A',
-          jizsl:'2',
-          ktiaoleix:'M'
+          id: "1",
+          coachType: "end",
+          name: "G100001",
+          wlname: "wlx",
+          lineName: "10001",
+          sn: "1",
+          chexhao: "01",
+          lieleix: "A",
+          trainNum: "2",
+          ktiaoleix: "M",
         },
       ],
-      total: 4,
+      total: 0,
       listLoading: true,
 
       form: {
         xianlu: "",
-        liechehao: "",
+        name: "",
+        pageIndex: 1,
+        pageRow: 10,
       },
-      temps:{
-        bma:'',
-        wxian:'',
-        xlu:"",
-        cping:'',
-        lcleix:'',
-        jz:'',
-        ktiao:''
+      temps: {
+        coachType: "",
+        id: "",
+        lineName: "",
+        name: "",
+        sn: "",
+        trainNum: "",
       },
-
 
       // ---------------------
-
+      // arr: [
+      //   {
+      //     id: 1,
+      //     path: "/root",
+      //     component: "root",
+      //     redirect: "1",
+      //     alwaysShow: true,
+      //     meta: { title: "1", icon: "1" },
+      //     children: [
+      //       {
+      //         id: 2,
+      //         path: "/2",
+      //         component: "root",
+      //         redirect: "2",
+      //         alwaysShow: true,
+      //         meta: { title: "2", icon: "2" },
+      //       },
+      //     ],
+      //   },
+      // ],
       listQuery: {
-        page: 1,
-        limit: 10,
-        importance: undefined,
-        title: undefined,
-        type: undefined,
-        sort: "+id",
+        pageIndex: 1,
+        pageRow: 10,
+        // importance: undefined,
+        // title: undefined,
+        // type: undefined,
+        // sort: "+id",
       },
       importanceOptions: [1, 2, 3],
       calendarTypeOptions,
@@ -373,13 +351,12 @@ export default {
       statusOptions: ["published", "draft", "deleted"],
       showReviewer: false,
       temp: {
-        id: undefined,
-        importance: 1,
-        remark: "",
-        timestamp: new Date(),
-        title: "",
-        type: "",
-        status: "published",
+        coachType: "",
+        // id: "",
+        lineName: "",
+        name: "",
+        sn: "",
+        trainNum: "",
       },
       dialogFormVisible: false,
       dialogStatus: "",
@@ -409,16 +386,15 @@ export default {
   },
   methods: {
     getList() {
-      // this.listLoading = true;
-      // fetchList(this.listQuery).then((response) => {
-      //   this.list = response.data.items;
-      //   this.total = response.data.total;
-      //   this.listLoading = false;
-      // });
+      this.listLoading = true;
+      fetchList(this.listQuery).then((response) => {
+        this.parts_list = response.data;
+        this.total = response.total;
         this.listLoading = false;
+      });
     },
     handleFilter() {
-      this.listQuery.page = 1;
+      this.listQuery.pageIndex = 1;
       this.getList();
     },
     handleModifyStatus(row, status) {
@@ -444,13 +420,12 @@ export default {
     },
     resetTemp() {
       this.temp = {
-        id: undefined,
-        importance: 1,
-        remark: "",
-        timestamp: new Date(),
-        title: "",
-        status: "published",
-        type: "",
+        coachType: "",
+        // id: "",
+        lineName: "",
+        name: "",
+        sn: "",
+        trainNum: "",
       };
     },
     handleCreate() {
@@ -464,17 +439,22 @@ export default {
     createData() {
       this.$refs["dataForm"].validate((valid) => {
         if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024; // mock a id
-          this.temp.author = "vue-element-admin";
-          createArticle(this.temp).then(() => {
-            this.list.unshift(this.temp);
-            this.dialogFormVisible = false;
-            this.$notify({
-              title: "成功",
-              message: "创建成功",
-              type: "success",
-              duration: 2000,
-            });
+          // this.temp.id = parseInt(Math.random() * 100) + 1024; // mock a id
+          // this.temp.author = "vue-element-admin";
+          createList(this.temp).then((res) => {
+            console.log("新增", res);
+            if (res.success) {
+              this.dialogFormVisible = false;
+              this.getList();
+              this.$notify({
+                title: "成功",
+                message: "创建成功",
+                type: "success",
+                duration: 2000,
+              });
+            } else {
+              console.error("新增失败");
+            }
           });
         }
       });
@@ -492,29 +472,41 @@ export default {
       this.$refs["dataForm"].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp);
-          tempData.timestamp = +new Date(tempData.timestamp); // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          updateArticle(tempData).then(() => {
-            const index = this.list.findIndex((v) => v.id === this.temp.id);
-            this.list.splice(index, 1, this.temp);
-            this.dialogFormVisible = false;
-            this.$notify({
-              title: "成功",
-              message: "更新成功",
-              type: "success",
-              duration: 2000,
-            });
+          // tempData.timestamp = +new Date(tempData.timestamp); // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
+          Update(tempData).then((res) => {
+            console.log("修改设备信息", res);
+            // this.getList();
+            if (res.success) {
+              this.dialogFormVisible = false;
+              this.getList();
+              this.$notify({
+                title: "成功",
+                message: "更新成功",
+                type: "success",
+                duration: 2000,
+              });
+            } else {
+              console.error("新增失败");
+            }
           });
         }
       });
     },
     handleDelete(row, index) {
-      this.$notify({
-        title: "成功",
-        message: "删除成功",
-        type: "success",
-        duration: 2000,
+      Delete({id:row.id}).then((res) => {
+        console.log("删除设备", res);
+        if (res.success) {
+          this.getList();
+          this.$notify({
+            title: "成功",
+            message: "删除成功",
+            type: "success",
+            duration: 2000,
+          });
+        } else {
+          console.error("删除失败");
+        }
       });
-      this.list.splice(index, 1);
     },
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {

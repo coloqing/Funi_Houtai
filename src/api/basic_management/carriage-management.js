@@ -7,6 +7,30 @@ export function getList(data) {
     params: data,
   });
 }
+//  新增 车厢信息
+export function createCoach(data) {
+  return request({
+    url: "/api/Coach",
+    method: "post",
+    data: data,
+  });
+}
+//  修改 车厢信息
+export function updateCoach(data) {
+  return request({
+    url: "/api/Coach/Update",
+    method: "post",
+    data: data,
+  });
+}
+//  删除 车厢信息
+export function deleteCoach(data) {
+  return request({
+    url: "/api/Coach/Delete",
+    method: "post",
+    data: data,
+  });
+}
 
 
 

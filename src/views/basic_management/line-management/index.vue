@@ -128,8 +128,8 @@
     <pagination
       v-show="total > 0"
       :total="total"
-      :page.sync="listQuery.page"
-      :limit.sync="listQuery.limit"
+      :page.sync="listQuery.pageIndex"
+      :limit.sync="listQuery.pageRow"
       @pagination="getList"
     />
 
@@ -213,13 +213,6 @@ import waves from "@/directive/waves"; // waves directive
 import { parseTime } from "@/utils";
 import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
 // 地址选择器
-// import {
-//   provinceAndCityData,
-//   pcTextArr,
-//   regionData,
-//   pcaTextArr,
-//   codeToText,
-// } from "element-china-area-data";
 import { pcTextArr } from "element-china-area-data";
 const calendarTypeOptions = [
   { key: "CN", display_name: "China" },
@@ -291,7 +284,7 @@ export default {
           devicePerCarriage: "2",
         },
       ],
-      total: 4,
+      total: 0,
       listLoading: true,
       // 新增/修改 对应表单
       temps: {
@@ -311,11 +304,11 @@ export default {
         province: undefined,
         // 市
         city: undefined,
-        page: 1,
-        limit: 10,
-        importance: undefined,
-        type: undefined,
-        sort: "+id",
+        pageIndex: 1,
+        pageRow: 10,
+        // importance: undefined,
+        // type: undefined,
+        // sort: "+id",
       },
       importanceOptions: [1, 2, 3],
       calendarTypeOptions,
@@ -367,14 +360,14 @@ export default {
         Lines(form).then((response) => {
           console.log("线路管理list", response);
           this.line_list = response.data;
-          this.total = response.data.length;
+          this.total = response.total;
           this.listLoading = false;
         });
       } else {
         Lines().then((response) => {
           console.log("线路管理list", response);
           this.line_list = response.data;
-          this.total = response.data.length;
+          this.total = response.total;
           this.listLoading = false;
         });
       }
@@ -394,7 +387,7 @@ export default {
     handleFilter() {
       //  selectedOptions   listQuery
       // 省 province   市 city
-      this.listQuery.page = 1;
+      this.listQuery.pageIndex = 1;
       this.listQuery.province = this.selectedOptions[0];
       this.listQuery.city = this.selectedOptions[1];
 
@@ -501,13 +494,32 @@ export default {
       });
     },
     handleDelete(row, index) {
-      this.$notify({
-        title: "成功",
-        message: "删除成功",
-        type: "success",
-        duration: 2000,
-      });
-      this.list.splice(index, 1);
+      
+        this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          // 确认删除的逻辑
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          });
+        }).catch(() => {
+          // 取消删除的逻辑
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });          
+        });
+
+
+      // this.$notify({
+      //   title: "成功",
+      //   message: "删除成功",
+      //   type: "success",
+      //   duration: 2000,
+      // });
     },
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {

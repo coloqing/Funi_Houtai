@@ -120,22 +120,22 @@
     />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+      <!-- :rules="rules" -->
       <el-form
         ref="dataForm"
-        :rules="rules"
         :model="temps"
         label-position="left"
         label-width="70px"
         style="width: 400px; margin-left: 50px"
       >
         <el-form-item label="线路" prop="title" label-width="100px" >
-          <el-input v-model="temps.xianlu" placeholder="请输入线路号" />
+          <el-input v-model="temps.lineName" placeholder="请输入线路号" />
         </el-form-item>
         <el-form-item label="列车号" label-width="100px" >
-          <el-input v-model="temps.liechehao" placeholder="请输入列车号"/>
+          <el-input v-model="temps.trainNum" placeholder="请输入列车号"/>
         </el-form-item>
         <el-form-item label="车厢号" label-width="100px" >
-          <el-input v-model="temps.cxhao" placeholder="请输入列车号"/>
+          <el-input v-model="temps.name" placeholder="请输入列车号"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -162,6 +162,9 @@ import {
 } from "@/api/article";
 import {
   getList,
+  createCoach,
+  updateCoach,
+  deleteCoach
 } from "@/api/basic_management/carriage-management";
 
 
@@ -240,9 +243,9 @@ export default {
       isAllEditable: false,
       // 新增/修改 表单
       temps:{
-        xianlu:'',
-        liechehao:'',
-        cxhao:''
+        lineName:'', // 线路
+        name:'',// 车厢号
+        trainNum:''// 列车号
       },
 
 
@@ -391,10 +394,11 @@ export default {
     createData() {
       this.$refs["dataForm"].validate((valid) => {
         if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024; // mock a id
-          this.temp.author = "vue-element-admin";
-          createArticle(this.temp).then(() => {
-            this.list.unshift(this.temp);
+          // this.temp.id = parseInt(Math.random() * 100) + 1024; // mock a id
+          // this.temp.author = "vue-element-admin";
+          createCoach(this.temps).then((res) => {
+            console.log('进行新增',res);
+            // this.list.unshift(this.temp);
             this.dialogFormVisible = false;
             this.$notify({
               title: "成功",

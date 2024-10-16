@@ -31,7 +31,87 @@ import nestedRouter from "./modules/nested";
     activeMenu: '/example/list'  if set path, the sidebar will highlight the path you set
   }
  */
-
+// let tmps = [
+//   {
+//     "path": "/basic_management",
+//     "component": "Layout",
+//     "redirect": "/line-management",
+//     "alwaysShow": true, 
+//     "meta": { "title": "基础管理", "icon": "el-icon-document" },
+//     "children": [
+//       {
+//         "path": "line",
+//         "component": "line",
+//         "name": "line",
+//         "meta": { "title": "线路管理", "roles": ["editor"] }
+//       },
+//       {
+//         "path": "train",
+//         "component": "train",
+//         "name": "train-management",
+//         "meta": { "title": "列车管理", "roles": ["admin", "editor"] }
+//       },
+//       {
+//         "path": "carriage",
+//         "component": "carriage",
+//         "name": "carriage-management",
+//         "meta": { "title": "车厢管理", "roles": ["admin", "editor"] }
+//       },
+//       {
+//         "path": "parts",
+//         "component": "parts",
+//         "name": "parts-management",
+//         "meta": { "title": "设备部件管理", "roles": ["admin", "editor"] }
+//       },
+//     ],
+//   },
+//   {
+//     "path": "/system_administration",
+//     "component": "Layout",
+//     "redirect": "/menu-management",
+//     "alwaysShow": true, 
+//     "meta": { "title": "系统管理", "icon": "el-icon-document" },
+//     "children": [
+//       {
+//         "path": "munu",
+//         "component": "munu",
+//         "meta": { "title": "菜单管理", "roles": ["admin", "editor"] }
+//       },
+//       {
+//         "path": "role",
+//         "component": "role",
+//         "meta": { "title": "角色管理", "roles": ["admin", "editor"] }
+//       },
+//       {
+//         "path": "organizational",
+//         "component": "organizational",
+//         "name": "organizational_management",
+//         "meta": { "title": "组织结构管理", "roles": ["admin", "editor"] }
+//       },
+//       {
+//         "path": "configuration",
+//         "component": "configuration",
+//         "name": "configuration_management",
+//         "meta": { "title": "系统配置管理", "roles": ["admin", "editor"] }
+//       },
+//     ],
+//   },
+//   {
+//     "path": "/user_management",
+//     "component": "Layout",
+//     "redirect": "/user_management",
+//     "alwaysShow": true, 
+//     "meta": { "title": "用户管理", "icon": "el-icon-document" },
+//     "children": [
+//       {
+//         "path": "user",
+//         "component": "user",
+//         "name": "user_management",
+//         "meta": { "title": "用户管理", "roles": ["admin", "editor"] }
+//       }
+//     ]
+//   }
+// ]
 /**
  * constantRoutes
  * a base page that does not have permission requirements
@@ -502,9 +582,7 @@ const createRouter = () =>
     mode: 'history', // require service support
     scrollBehavior: () => ({ y: 0 }),
     routes: constantRoutes,
-    // routes: [],
   });
-// console.log('静态路由',constantRoutes);
 
 const router = createRouter();
 

@@ -36,6 +36,27 @@ export function filterAsyncRoutes(routes, roles) {
 
   return res;
 }
+export function updateAsyncRoutes(routes) {
+    console.log('需要修改的路由',routes);
+    let tmp  = JSON.parse(JSON.stringify(routes))
+    console.log('深拷贝',tmp);
+    for (let i = 0; i < tmp.length; i++) {
+      // Layout  为字符串 修改为变量
+      if (tmp[i].component) {
+        tmp[i].component = Layout
+      }
+      // 子路由 component:basic  修改为对应的路径
+      if (tmp[i].children) {
+        for (let j = 0; j < tmp[i].children.length; j++) {
+          tmp[i].children[j].component = router_dictionary[tmp[i].children[j].component]
+          // console.log('匹配字典',router_dictionary[tmp[i].children[j].component],tmp[i].children[j]);
+        }
+      }
+    }
+    return tmp
+}
+
+
 
 const state = {
   // 完整的路由表
@@ -57,9 +78,13 @@ const mutations = {
   },
 };
 // 路由菜单
-const arrxx = [
-  {a:() => import("@/views/clipboard/index")}
-]
+const router_dictionary = 
+  {
+  a:() => import("@/views/clipboard/index"),
+  basic: () => import("@/views/basic_management/line-management/index"),
+  system:() => import("@/views/system_administration/menu_management/index")
+  }
+
 
 const actions = {
   generateRoutes({ commit }, roles) {
@@ -68,23 +93,48 @@ const actions = {
       console.log("用户身份",roles);
       console.log("路由信息",asyncRoutes);
       let accessedRoutes;
+      let array
       //这里可以写自己的拦截逻辑
       // if (roles.includes("admin")) {
       if (true) {
         // accessedRoutes = asyncRoutes || [];
-        accessedRoutes = [
+        accessedRoutes = [];
+         array = [
           {
-            path: "/clipboard",
-            component: Layout,
+            path: "/basic_management",
+            component: 'Layout',
+            redirect: "/line-management",
+            alwaysShow: true, 
+            meta: { title: "基础管理", icon: "el-icon-document" },
             children: [
               {
-                path: "index",
-                component: arrxx[0].a,
-                // name: "ClipboardDemo",
-                meta: { title: "clipboardDemo", icon: "clipboard" },
+                path: "line",
+                component:'basic',
+                name: "line",
+                meta: { title: "线路管理", roles: ["editor"] },
+              }
+            ]
+          },
+          {
+            path: "/system_administration",
+            component: 'Layout',
+            redirect: "/menu-management",
+            alwaysShow: true, 
+            meta: { title: "系统管理", icon: "el-icon-document" },
+            children: [
+              {
+                path: "munu",
+                component: 'system',
+                name: "menu_management",
+                meta: { title: "菜单管理", roles: ["admin", "editor"] },
               },
-            ],
-          }];
+            ]
+          }
+        ];
+          // 路由获取完成 开始调整路由数据
+          array = updateAsyncRoutes(array)
+
+
       }
       //  else if(roles.includes('doctor')){
       //   //通过所属的角色去过滤路由，生成新的路由表

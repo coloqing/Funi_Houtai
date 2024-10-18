@@ -3,13 +3,24 @@
     <div class="filter-container">
       <el-form :inline="true">
         <el-form-item label="列车线路">
-          <el-input
+          <!-- <el-input
             v-model="listQuery.lineId"
             placeholder="线路"
             style="width: 200px; margin-right: 10px"
             class="filter-item"
             @keyup.enter.native="handleFilter"
-          />
+          /> -->
+          <!-- <el-form-item label="线路"> -->
+            <el-select v-model="listQuery.lineId" placeholder="请选择线路">
+              <el-option
+                v-for="item in line_list"
+                :key="item.id"
+                :label="item.name"
+                :value="item.lineId"
+              >
+              </el-option>
+            </el-select>
+          <!-- </el-form-item> -->
         </el-form-item>
         <el-form-item label="省-市">
           <el-cascader
@@ -117,7 +128,7 @@
             v-if="row.status != 'deleted'"
             size="mini"
             type="danger"
-            @click="handleDelete(row, $index)"
+            @click="handleDelete(row, row.id)"
           >
             删除
           </el-button>
@@ -250,40 +261,7 @@ export default {
       pcTextArr,
       selectedOptions: [],
       tableKey: 0,
-      line_list: [
-        {
-          id: "1",
-          province: "广东省",
-          city: "揭阳市",
-          name: "10001",
-          grouping: "01",
-          devicePerCarriage: "1",
-        },
-        {
-          id: "2",
-          province: "广东省",
-          city: "揭阳市",
-          name: "10001",
-          grouping: "02",
-          devicePerCarriage: "2",
-        },
-        {
-          id: "3",
-          province: "广东省",
-          city: "普宁市",
-          name: "10002",
-          grouping: "01",
-          devicePerCarriage: "1",
-        },
-        {
-          id: "4",
-          province: "广东省",
-          city: "普宁市",
-          name: "10002",
-          grouping: "02",
-          devicePerCarriage: "2",
-        },
-      ],
+      line_list:null,
       total: 0,
       listLoading: true,
       // 新增/修改 对应表单
@@ -356,21 +334,21 @@ export default {
   methods: {
     getList(form) {
       this.listLoading = true;
-      if (form) {
-        Lines(form).then((response) => {
-          console.log("线路管理list", response);
-          this.line_list = response.data;
-          this.total = response.total;
-          this.listLoading = false;
-        });
-      } else {
-        Lines().then((response) => {
-          console.log("线路管理list", response);
-          this.line_list = response.data;
-          this.total = response.total;
-          this.listLoading = false;
-        });
-      }
+      // if (form) {
+      //   Lines(this.listQuery).then((response) => {
+      //     console.log("线路管理list", response);
+      //     this.line_list = response.data;
+      //     this.total = response.total;
+      //     this.listLoading = false;
+      //   });
+      // } else {
+      Lines(this.listQuery).then((response) => {
+        // console.log("线路管理list", response);
+        this.line_list = response.data;
+        this.total = response.total;
+        this.listLoading = false;
+      });
+      // }
     },
     // 清除temps
     clear_temps() {
@@ -382,7 +360,19 @@ export default {
         grouping: "",
         devicePerCarriage: "",
       };
-      this.selectedOptions= []
+      this.selectedOptions = [];
+    },
+    clear_listQuery() {
+      this.listQuery = {
+        // 线路
+        lineId: undefined,
+        // 省
+        province: undefined,
+        // 市
+        city: undefined,
+        pageIndex: 1,
+        pageRow: 10,
+      };
     },
     handleFilter() {
       //  selectedOptions   listQuery
@@ -494,32 +484,25 @@ export default {
       });
     },
     handleDelete(row, index) {
-      
-        this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
+      this.$confirm("此操作将永久删除id为 "+ index +" 的线路, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
           // 确认删除的逻辑
           this.$message({
-            type: 'success',
-            message: '删除成功!'
+            type: "success",
+            message: "删除成功!",
           });
-        }).catch(() => {
+        })
+        .catch(() => {
           // 取消删除的逻辑
           this.$message({
-            type: 'info',
-            message: '已取消删除'
-          });          
+            type: "info",
+            message: "已取消删除",
+          });
         });
-
-
-      // this.$notify({
-      //   title: "成功",
-      //   message: "删除成功",
-      //   type: "success",
-      //   duration: 2000,
-      // });
     },
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
@@ -529,7 +512,8 @@ export default {
     },
     // 重置
     handleDownload() {
-      this.clear_temps();
+      this.clear_temps(); //多余
+      this.clear_listQuery();
       this.getList();
     },
     formatJson(filterVal) {

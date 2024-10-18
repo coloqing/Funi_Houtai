@@ -7,10 +7,10 @@ export function getConfig(query) {
     params: query
   })
 }
-// 新增 系统配置
+// 修改 系统配置
 export function getConfig(query) {
   return request({
-    url: '/api/Config',
+    url: '/api/Config/Update',
     method: 'get',
     params: query
   })

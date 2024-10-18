@@ -43,7 +43,7 @@
             v-if="row.status != 'deleted'"
             size="mini"
             type="danger"
-            @click="handleDelete(row, $index)"
+            @click="handleDelete(row, row.id)"
           >
             删除
           </el-button>
@@ -68,7 +68,7 @@
           <el-cascader
             v-model="selectedLeafNode"
             :options="tableData"
-            :props="{ checkStrictly: true ,value: 'id', label: 'name' }"
+            :props="{ checkStrictly: true, value: 'id', label: 'name' }"
             @change="handleChange"
             style="width: 100%"
           ></el-cascader>
@@ -76,8 +76,6 @@
         <el-form-item label="排序" prop="order" label-width="100px">
           <el-input v-model="temps.order" placeholder="请排序" />
         </el-form-item>
-
-
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">
@@ -95,15 +93,19 @@
 </template>
 
 <script>
-import { getOrgStructure,createOrgStructure,Update } from "@/api/system_administration/organizational_management";
+import {
+  getOrgStructure,
+  createOrgStructure,
+  Update,
+} from "@/api/system_administration/organizational_management";
 export default {
   data() {
     return {
       // a: null,
       // 被选中的下拉菜单
-      selectedLeafNode:null,
+      selectedLeafNode: null,
       // 新增 修改 title
-      dialogStatus:null,
+      dialogStatus: null,
       // 表格数据
       tableData: [
         {
@@ -147,7 +149,7 @@ export default {
       temps: {
         name: "",
         parentId: null,
-        order:0
+        order: 0,
       },
       rules: {
         type: [{ required: true, message: "请输入省市", trigger: "change" }],
@@ -200,15 +202,15 @@ export default {
     handleAddRole() {
       this.dialogStatus = "new";
       this.dialogVisible = true;
-      this.reset_temps()
-      this.selectedLeafNode = null
+      this.reset_temps();
+      this.selectedLeafNode = null;
     },
     // 新增
     createData() {
       this.$refs["dataForm"].validate((valid) => {
         if (valid) {
-          if(this.temps.parentId === null){
-            this.temps.parentId = 0
+          if (this.temps.parentId === null) {
+            this.temps.parentId = 0;
           }
           createOrgStructure(this.temps).then((res) => {
             console.log("新增部门", res);
@@ -220,7 +222,7 @@ export default {
               type: "success",
               duration: 2000,
             });
-            this.reset_temps()
+            this.reset_temps();
           });
         }
       });
@@ -234,10 +236,9 @@ export default {
       console.log("操作的对象", this.temps);
       this.dialogStatus = "update";
       this.dialogVisible = true;
-
     },
     // 修改
-    updateData(){
+    updateData() {
       this.$refs["dataForm"].validate((valid) => {
         if (valid) {
           Update(this.temps).then((res) => {
@@ -255,20 +256,44 @@ export default {
       });
     },
     // 上级菜单选择
-    handleChange(value){
-      this.temps.parentId = value[value.length-1]
-      console.log('当前选中的值id:',this.temps.parentId);
+    handleChange(value) {
+      this.temps.parentId = value[value.length - 1];
+      console.log("当前选中的值id:", this.temps.parentId);
     },
     // 重置temps
-    reset_temps(){
+    reset_temps() {
       this.temps = {
         name: "",
         parentId: null,
-        order:0
-      }
+        order: 0,
+      };
     },
-
-
+    // 删除
+    handleDelete(row, index) {
+      this.$confirm(
+        "此操作将永久删除id为 " + index + " 的线路, 是否继续?",
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          // 确认删除的逻辑
+          this.$message({
+            type: "success",
+            message: "删除成功!",
+          });
+        })
+        .catch(() => {
+          // 取消删除的逻辑
+          this.$message({
+            type: "info",
+            message: "已取消删除",
+          });
+        });
+    },
 
     load(tree, treeNode, resolve) {
       setTimeout(() => {

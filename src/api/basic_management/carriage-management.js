@@ -23,6 +23,14 @@ export function updateCoach(data) {
     data: data,
   });
 }
+//  多条修改 车厢信息
+export function updateMuch(data) {
+  return request({
+    url: "/api/Coach/UpdateMuch",
+    method: "post",
+    data: data,
+  });
+}
 //  删除 车厢信息
 export function deleteCoach(data) {
   return request({

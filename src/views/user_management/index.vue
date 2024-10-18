@@ -33,12 +33,13 @@
         <el-form-item>
           <el-button
             v-waves
+            :loading="downloadLoading"
             class="filter-item"
             type="primary"
-            icon="el-icon-search"
-            @click="handleFilter"
+            icon="el-icon-refresh"
+            @click="handleDownload"
           >
-            搜索
+            重置
           </el-button>
           <el-button
             class="filter-item"
@@ -51,13 +52,12 @@
           </el-button>
           <el-button
             v-waves
-            :loading="downloadLoading"
             class="filter-item"
             type="primary"
-            icon="el-icon-refresh"
-            @click="handleDownload"
+            icon="el-icon-search"
+            @click="handleFilter"
           >
-            重置
+            搜索
           </el-button>
         </el-form-item>
       </el-form>
@@ -119,7 +119,7 @@
             v-if="row.status != 'deleted'"
             size="mini"
             type="danger"
-            @click="handleDelete(row, $index)"
+            @click="handleDelete(row, row.id)"
           >
             删除
           </el-button>
@@ -133,8 +133,8 @@
     <pagination
       v-show="total > 0"
       :total="total"
-      :page.sync="listQuery.page"
-      :limit.sync="listQuery.limit"
+      :page.sync="listQuery.pageIndex"
+      :limit.sync="listQuery.pageRow"
       @pagination="getList"
     />
     <!-- 新增/修改 -->
@@ -373,12 +373,12 @@ export default {
       total: 4,
       listLoading: true,
       listQuery: {
-        page: 1,
-        limit: 10,
-        importance: undefined,
-        title: undefined,
-        type: undefined,
-        sort: "+id",
+        pageIndex: 1,
+        pageRow: 10,
+        // importance: undefined,
+        // title: undefined,
+        // type: undefined,
+        // sort: "+id",
       },
       importanceOptions: [1, 2, 3],
       calendarTypeOptions,
@@ -428,29 +428,29 @@ export default {
     // 获取用户数据列表
     getList(data) {
       this.listLoading = true;
-      if (data) {
-        fetchList(data).then((response) => {
-          if (response.code === 200) {
-            // this.list = response.data;
-            this.user_list = response.data;
-            this.total = response.data.length;
-            this.listLoading = false;
-          } else {
-            console.err("获取用户数据接口执行失败");
-          }
-        });
-      }else{
-        fetchList().then((response) => {
-          if (response.code === 200) {
-            // this.list = response.data;
-            this.user_list = response.data;
-            this.total = response.data.length;
-            this.listLoading = false;
-          } else {
-            console.err("获取用户数据接口执行失败");
-          }
-        });
-      }
+      // if (data) {
+      fetchList(this.listQuery).then((response) => {
+        if (response.code === 200) {
+          // this.list = response.data;
+          this.user_list = response.data;
+          this.total = response.data.length;
+          this.listLoading = false;
+        } else {
+          console.err("获取用户数据接口执行失败");
+        }
+      });
+      // } else {
+      //   fetchList().then((response) => {
+      //     if (response.code === 200) {
+      //       // this.list = response.data;
+      //       this.user_list = response.data;
+      //       this.total = response.data.length;
+      //       this.listLoading = false;
+      //     } else {
+      //       console.err("获取用户数据接口执行失败");
+      //     }
+      //   });
+      // }
       // this.listLoading = false;
     },
     // 获取系统角色列表
@@ -464,8 +464,9 @@ export default {
       });
     },
     handleFilter() {
-      this.listQuery.page = 1;
-      this.getList(this.form);
+      this.listQuery.pageIndex = 1;
+      // this.getList(this.form);
+      this.getList();
     },
     handleModifyStatus(row, status) {
       this.$message({
@@ -505,7 +506,7 @@ export default {
         password: "",
         phone: "",
         avatar:
-          "https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif?imageView2/1/w/80/h/80",
+          "https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif",
         introduction: "Permissions",
       }),
         this.resetTemp();
@@ -609,22 +610,41 @@ export default {
     },
     // 删除用户
     handleDelete(row, index) {
-      Delete(row).then((res) => {
-        console.log("删除用户", res);
-        if (res.success) {
-          this.getList();
-          this.$notify({
-            title: "成功",
-            message: "" + res.message,
-            type: "success",
-            duration: 2000,
-          });
-        } else {
-          console.log("删除用户", res);
+      this.$confirm(
+        "此操作将永久删除id为 " + index + " 的线路, 是否继续?",
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
         }
-      });
+      )
+        .then(() => {
+          Delete(row).then((res) => {
+            console.log("删除用户", res);
+            if (res.success) {
+              this.getList();
+              this.$message({
+                type: "success",
+                message: "删除成功!",
+              });
+            } else {
+              this.$message({
+                type: "info",
+                message: "删除失败",
+              });
+            }
+          });
+        })
+        .catch(() => {
+          // 取消删除的逻辑
+          this.$message({
+            type: "info",
+            message: "已取消删除",
+          });
+        });
     },
-    // 
+    //
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
         this.pvData = response.data.pvData;
@@ -632,24 +652,10 @@ export default {
       });
     },
     handleDownload() {
-      this.downloadLoading = true;
-      import("@/vendor/Export2Excel").then((excel) => {
-        const tHeader = ["timestamp", "title", "type", "importance", "status"];
-        const filterVal = [
-          "timestamp",
-          "title",
-          "type",
-          "importance",
-          "status",
-        ];
-        const data = this.formatJson(filterVal);
-        excel.export_json_to_excel({
-          header: tHeader,
-          data,
-          filename: "table-list",
-        });
-        this.downloadLoading = false;
-      });
+      this.listQuery = {
+        pageIndex: 1,
+        pageRow: 10,
+      };
     },
     formatJson(filterVal) {
       return this.list.map((v) =>

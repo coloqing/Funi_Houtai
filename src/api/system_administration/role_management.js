@@ -33,11 +33,11 @@ export function updateRole(data) {
 }
 // 删除角色
 export function Delect(query) {
-//   return request({
-//     url: '/api/Role',
-//     method: 'get',
-//     // params: query
-//   })
+  return request({
+    url: '/api/Role/Delete',
+    method: 'post',
+    data: query
+  })
 }
 
 

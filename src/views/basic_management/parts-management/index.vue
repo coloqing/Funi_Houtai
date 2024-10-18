@@ -2,18 +2,20 @@
   <div class="app-container lin_management">
     <div class="filter-container" style="display: flex; align-items: baseline">
       <el-form :inline="true">
-        <el-form-item label="列车线路">
-          <el-input
-            v-model="form.xianlu"
-            placeholder="线路"
-            style="width: 200px; margin-right: 10px"
-            class="filter-item"
-            @keyup.enter.native="handleFilter"
-          />
+        <el-form-item label="线路">
+          <el-select v-model="listQuery.lineName" placeholder="请选择线路">
+            <el-option
+              v-for="item in line_list"
+              :key="item.id"
+              :label="item.name"
+              :value="item.name"
+            >
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="列车号">
           <el-input
-            v-model="form.name"
+            v-model="listQuery.trainNum"
             placeholder="列车号"
             style="width: 200px; margin-right: 10px"
             class="filter-item"
@@ -24,12 +26,13 @@
         <el-form-item>
           <el-button
             v-waves
+            :loading="downloadLoading"
             class="filter-item"
             type="primary"
-            icon="el-icon-search"
-            @click="handleFilter"
+            icon="el-icon-refresh"
+            @click="handleDownload"
           >
-            搜索
+            重置
           </el-button>
           <el-button
             class="filter-item"
@@ -40,15 +43,15 @@
           >
             新增
           </el-button>
+
           <el-button
             v-waves
-            :loading="downloadLoading"
             class="filter-item"
             type="primary"
-            icon="el-icon-refresh"
-            @click="handleDownload"
+            icon="el-icon-search"
+            @click="handleFilter"
           >
-            重置
+            搜索
           </el-button>
         </el-form-item>
       </el-form>
@@ -146,7 +149,7 @@
             v-if="row.status != 'deleted'"
             size="mini"
             type="danger"
-            @click="handleDelete(row, $index)"
+            @click="handleDelete(row, row.id)"
           >
             删除
           </el-button>
@@ -239,6 +242,7 @@ import {
   Update,
   Delete,
 } from "@/api/basic_management/parts-management";
+import { Lines } from "@/api/basic_management/line-management";
 
 import waves from "@/directive/waves"; // waves directive
 import { parseTime } from "@/utils";
@@ -297,7 +301,8 @@ export default {
       ],
       total: 0,
       listLoading: true,
-
+      // 列车线路
+      line_list: null,
       form: {
         xianlu: "",
         name: "",
@@ -337,6 +342,8 @@ export default {
       listQuery: {
         pageIndex: 1,
         pageRow: 10,
+        lineName: undefined,
+        trainNum: undefined,
         // importance: undefined,
         // title: undefined,
         // type: undefined,
@@ -383,14 +390,23 @@ export default {
   },
   created() {
     this.getList();
+    this.getLines();
   },
   methods: {
+    // 获取表格数据
     getList() {
       this.listLoading = true;
       fetchList(this.listQuery).then((response) => {
         this.parts_list = response.data;
         this.total = response.total;
         this.listLoading = false;
+      });
+    },
+    // 获取所有线路
+    getLines() {
+      Lines().then((response) => {
+        console.log("线路信息", response);
+        this.line_list = response.data;
       });
     },
     handleFilter() {
@@ -493,20 +509,39 @@ export default {
       });
     },
     handleDelete(row, index) {
-      Delete({id:row.id}).then((res) => {
-        console.log("删除设备", res);
-        if (res.success) {
-          this.getList();
-          this.$notify({
-            title: "成功",
-            message: "删除成功",
-            type: "success",
-            duration: 2000,
-          });
-        } else {
-          console.error("删除失败");
+      this.$confirm(
+        "此操作将永久删除id为 " + index + " 的线路, 是否继续?",
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
         }
-      });
+      )
+        .then(() => {
+          Delete({ id: index }).then((res) => {
+            if (res.success) {
+              this.getList();
+              // 确认删除的逻辑
+              this.$message({
+                type: "success",
+                message: "删除成功!",
+              });
+            } else {
+              this.$message({
+                type: "info",
+                message: "删除失败",
+              });
+            }
+          });
+        })
+        .catch(() => {
+          // 取消删除的逻辑
+          this.$message({
+            type: "info",
+            message: "已取消删除",
+          });
+        });
     },
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
@@ -515,24 +550,13 @@ export default {
       });
     },
     handleDownload() {
-      this.downloadLoading = true;
-      import("@/vendor/Export2Excel").then((excel) => {
-        const tHeader = ["timestamp", "title", "type", "importance", "status"];
-        const filterVal = [
-          "timestamp",
-          "title",
-          "type",
-          "importance",
-          "status",
-        ];
-        const data = this.formatJson(filterVal);
-        excel.export_json_to_excel({
-          header: tHeader,
-          data,
-          filename: "table-list",
-        });
-        this.downloadLoading = false;
-      });
+      this.listQuery = {
+        pageIndex: 1,
+        pageRow: 10,
+        lineName: undefined,
+        trainNum: undefined,
+      };
+      this.getList();
     },
     formatJson(filterVal) {
       return this.list.map((v) =>

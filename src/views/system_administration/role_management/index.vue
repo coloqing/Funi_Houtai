@@ -30,7 +30,11 @@
           <el-button type="primary" size="small" @click="handleEdit(scope)">
             {{ $t("permission.editPermission") }}
           </el-button>
-          <el-button type="danger" size="small" @click="handleDelete(scope)">
+          <el-button
+            type="danger"
+            size="small"
+            @click="handleDelete(scope.row, scope.row.id)"
+          >
             {{ $t("permission.delete") }}
           </el-button>
         </template>
@@ -58,11 +62,10 @@
             ref="tree"
             :check-strictly="checkStrictly"
             :data="routesData"
-            v-model="checkedKeys"
             :props="defaultProps"
             @check-change="check_change"
             show-checkbox
-            node-key="name"
+            node-key="id"
             class="permission-tree"
             :default-checked-keys="checkedKeys"
           />
@@ -77,7 +80,7 @@
         </el-form-item>
       </el-form>
       <div style="text-align: right">
-        <el-button type="danger" @click="dialogVisible = false">
+        <el-button type="danger" @click="ccc()">
           {{ $t("permission.cancel") }}
         </el-button>
         <!-- <el-button type="primary" @click="confirmRole"> -->
@@ -109,6 +112,7 @@ import {
   addRole,
   updateRole,
   getApi,
+  Delect,
 } from "@/api/system_administration/role_management";
 
 const defaultRole = {
@@ -137,7 +141,7 @@ export default {
       // 点击修改权限时默认勾选的值
       checkedKeys: null,
       // 显示的权限范围
-      role_apiName:'',
+      role_apiName: "",
     };
   },
   computed: {
@@ -174,12 +178,15 @@ export default {
         }
       });
     },
-
+    ccc() {
+      this.dialogVisible = false;
+      this.$refs.tree.setCheckedKeys([]);
+    },
     // ali----voer-------
     // 勾选权限范围
     check_change() {
       const checkedNodes = this.$refs.tree.getCheckedNodes();
-      const checkedKeys = checkedNodes.map((node) => [node.id,node.name]); // 假设每个节点的id是唯一标识
+      const checkedKeys = checkedNodes.map((node) => [node.id, node.name]); // 假设每个节点的id是唯一标识
       this.role.apiIds = "";
       this.role_apiName = "";
       for (let i = 0; i < checkedKeys.length; i++) {
@@ -271,11 +278,8 @@ export default {
       this.dialogVisible = true;
       this.checkStrictly = true;
       // 默认选中
-      let tmp = scope.row.apiIds.split(',')
-      this.checkedKeys = tmp
-
-
-
+      let tmp = scope.row.apiIds.split(",");
+      this.checkedKeys = tmp;
       this.role = deepClone(scope.row);
       // this.$nextTick(() => {
       //   const routes = this.generateRoutes(this.role.routes);
@@ -284,22 +288,41 @@ export default {
       //   this.checkStrictly = false;
       // });
     },
-    handleDelete({ $index, row }) {
-      this.$confirm("Confirm to remove the role?", "Warning", {
-        confirmButtonText: "Confirm",
-        cancelButtonText: "Cancel",
-        type: "warning",
-      })
-        .then(async () => {
-          await deleteRole(row.key);
-          this.rolesList.splice($index, 1);
-          this.$message({
-            type: "success",
-            message: "Delete succed!",
+    handleDelete(row, index) {
+      console.log("进行删除", row, index);
+
+      this.$confirm(
+        "此操作将永久删除id为 " + index + " 的线路, 是否继续?",
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          Delect({ id: index }).then((res) => {
+            if (res.success) {
+              this.getList();
+              // 确认删除的逻辑
+              this.$message({
+                type: "success",
+                message: "删除成功!",
+              });
+            } else {
+              this.$message({
+                type: "info",
+                message: "删除失败",
+              });
+            }
           });
         })
-        .catch((err) => {
-          console.error(err);
+        .catch(() => {
+          // 取消删除的逻辑
+          this.$message({
+            type: "info",
+            message: "已取消删除",
+          });
         });
     },
     generateTree(routes, basePath = "/", checkedKeys) {

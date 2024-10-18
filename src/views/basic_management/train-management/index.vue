@@ -2,18 +2,29 @@
   <div class="app-container lin_management">
     <div class="filter-container">
       <el-form :inline="true">
-        <el-form-item label="线路">
+        <!-- <el-form-item label="线路">
           <el-input
-            v-model="form.lineId"
+            v-model="listQuery.lineId"
             placeholder="请输入线路"
             style="width: 200px; margin-right: 10px"
             class="filter-item"
             @keyup.enter.native="handleFilter"
           />
+        </el-form-item> -->
+        <el-form-item label="线路">
+          <el-select v-model="listQuery.lineId" placeholder="请选择线路">
+            <el-option
+              v-for="item in line_list"
+              :key="item.id"
+              :label="item.name"
+              :value="item.lineId"
+            >
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="列车号">
           <el-input
-            v-model="form.name"
+            v-model="listQuery.name"
             placeholder="列车号"
             style="width: 200px; margin-right: 10px"
             class="filter-item"
@@ -24,12 +35,13 @@
         <el-form-item>
           <el-button
             v-waves
+            :loading="downloadLoading"
             class="filter-item"
             type="primary"
-            icon="el-icon-search"
-            @click="handleFilter"
+            icon="el-icon-refresh"
+            @click="handleDownload"
           >
-            搜索
+            重置
           </el-button>
           <el-button
             class="filter-item"
@@ -42,13 +54,12 @@
           </el-button>
           <el-button
             v-waves
-            :loading="downloadLoading"
             class="filter-item"
             type="primary"
-            icon="el-icon-refresh"
-            @click="handleDownload"
+            icon="el-icon-search"
+            @click="handleFilter"
           >
-            重置
+            搜索
           </el-button>
         </el-form-item>
       </el-form>
@@ -108,7 +119,7 @@
             v-if="row.status != 'deleted'"
             size="mini"
             type="danger"
-            @click="handleDelete(row, $index)"
+            @click="handleDelete(row, row.id)"
           >
             删除
           </el-button>
@@ -119,8 +130,8 @@
     <pagination
       v-show="total > 0"
       :total="total"
-      :page.sync="listQuery.page"
-      :limit.sync="listQuery.limit"
+      :page.sync="listQuery.pageIndex"
+      :limit.sync="listQuery.pageRow"
       @pagination="getList"
     />
 
@@ -145,7 +156,7 @@
           >
             <el-option
               v-for="item in line_list"
-              :key="item.lineId"
+              :key="item.id"
               :label="item.name"
               :value="item.lineId"
             >
@@ -155,7 +166,6 @@
         <el-form-item label="列车号" label-width="100px">
           <el-input v-model="temps.name" placeholder="请输入列车号" />
         </el-form-item>
-
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
@@ -198,7 +208,11 @@ import {
   updateArticle,
 } from "@/api/article";
 
-import { getTrain,createTrain,Update } from "@/api/basic_management/train-management";
+import {
+  getTrain,
+  createTrain,
+  Update,
+} from "@/api/basic_management/train-management";
 
 import { Lines } from "@/api/basic_management/line-management";
 import waves from "@/directive/waves"; // waves directive
@@ -250,7 +264,7 @@ export default {
         { id: "4", lineId: "G10001", name: "10001" },
       ],
       line_list: null,
-      total: 4,
+      total: 0,
       listLoading: true,
       // 查询的表单
       form: {
@@ -266,12 +280,14 @@ export default {
       // =============================
 
       listQuery: {
-        page: 1,
-        limit: 10,
-        importance: undefined,
-        title: "",
-        type: undefined,
-        sort: "+id",
+        pageIndex: 1,
+        pageRow: 10,
+        lineId: undefined,
+        name: undefined,
+        // importance: undefined,
+        // title: "",
+        // type: undefined,
+        // sort: "+id",
       },
       importanceOptions: [1, 2, 3],
       calendarTypeOptions,
@@ -320,9 +336,9 @@ export default {
   methods: {
     getList() {
       this.listLoading = true;
-      getTrain(this.form).then((response) => {
+      getTrain(this.listQuery).then((response) => {
         this.train_list = response.data;
-        this.total = response.data.length;
+        this.total = response.total;
         this.listLoading = false;
       });
       this.listLoading = false;
@@ -335,7 +351,7 @@ export default {
       });
     },
     handleFilter() {
-      this.listQuery.page = 1;
+      this.listQuery.pageIndex = 1;
       this.getList();
       console.log("我要进行查询");
     },
@@ -365,7 +381,7 @@ export default {
       this.temps = {
         lineId: "",
         name: "",
-      }
+      };
     },
     // resetTemp() {
     //   this.temp = {
@@ -394,7 +410,7 @@ export default {
           createTrain(this.temps).then((res) => {
             // this.list.unshift(this.temp);
             this.getList();
-            console.log('新增列车',res);
+            console.log("新增列车", res);
             this.dialogFormVisible = false;
             this.$notify({
               title: "成功",
@@ -415,7 +431,7 @@ export default {
       this.$refs["dataForm"].validate((valid) => {
         if (valid) {
           Update(this.temps).then(() => {
-            this.getList()
+            this.getList();
             this.dialogFormVisible = false;
             this.$notify({
               title: "成功",
@@ -428,13 +444,29 @@ export default {
       });
     },
     handleDelete(row, index) {
-      this.$notify({
-        title: "成功",
-        message: "删除成功",
-        type: "success",
-        duration: 2000,
-      });
-      this.list.splice(index, 1);
+      this.$confirm(
+        "此操作将永久删除id为 " + index + " 的线路, 是否继续?",
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          // 确认删除的逻辑
+          this.$message({
+            type: "success",
+            message: "删除成功!",
+          });
+        })
+        .catch(() => {
+          // 取消删除的逻辑
+          this.$message({
+            type: "info",
+            message: "已取消删除",
+          });
+        });
     },
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
@@ -443,7 +475,12 @@ export default {
       });
     },
     handleDownload() {
-      this.form = {}
+      this.listQuery = {
+        pageIndex: 1,
+        pageRow: 10,
+        lineId: undefined,
+        name: undefined,
+      };
       this.getList();
       // this.downloadLoading = true;
       // import("@/vendor/Export2Excel").then((excel) => {

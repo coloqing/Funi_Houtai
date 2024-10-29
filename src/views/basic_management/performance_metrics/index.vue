@@ -68,22 +68,22 @@
           <span>{{ row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="部件编号" min-width="110px" align="center">
+      <el-table-column label="指标名称" min-width="110px" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.sn }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="名称" min-width="110px" align="center">
-        <template slot-scope="{ row }" align="center">
           <span>{{ row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="关联性能指标id" min-width="80px" align="center">
-        <template slot-scope="{ row }">
-          <span>{{ row.indicatorsIds }}</span>
+      <el-table-column label="最大阈值" min-width="110px" align="center">
+        <template slot-scope="{ row }" align="center">
+          <span>{{ row.max }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="信号量编码" min-width="80px" align="center">
+      <el-table-column label="最小阈值" min-width="80px" align="center">
+        <template slot-scope="{ row }">
+          <span>{{ row.min }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="关联的信号量编码" min-width="80px" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.signalCode }}</span>
         </template>
@@ -117,20 +117,24 @@
         label-width="70px"
         style="width: 400px; margin-left: 50px"
       >
-        <el-form-item label="部件编码" prop="coachType" label-width="120px">
-          <el-input v-model="temp.sn" placeholder="请输入部件编码" />
+        <el-form-item label="指标名称" prop="coachType" label-width="130px">
+          <el-input v-model="temp.name" placeholder="请输入部件编码" />
         </el-form-item>
-        <el-form-item label="部件名称" label-width="120px">
-          <el-input v-model="temp.name" placeholder="请输入部件名称" />
+        <el-form-item label="最大阈值" label-width="130px">
+          <el-input v-model="temp.max" placeholder="请输入部件名称" />
         </el-form-item>
-        <el-form-item label="关联性能指标id" label-width="120px">
+        <el-form-item label="最小阈值" label-width="130px">
+          <el-input v-model="temp.min" placeholder="请输入部件名称" />
+        </el-form-item>
+        <el-form-item label="关联的信号量编码" label-width="130px">
           <!-- <el-input v-model="temp.indicatorsIds" placeholder="请输入关联性能指标id" /> -->
-          <el-select v-model="temp.indicatorsIds" multiple collapse-tags placeholder="请选择关联性能指标">
+          <!-- <el-select v-model="temp.indicatorsIds" multiple collapse-tags placeholder="请选择信号量编码">
+            <el-option v-for="item in parts_options" :key="item.value" :label="item.label" :value="item.value">
+            </el-option>
+          </el-select>-->
+          <el-select v-model="temp.signalCode" filterable placeholder="请选择信号量编码">
             <el-option v-for="item in parts_options" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
-        </el-form-item>
-        <el-form-item label="信号量编码" label-width="120px">
-          <el-input v-model="temp.signalCode" placeholder="请输入信号量编码" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -165,7 +169,7 @@ import {
   createList,
   Update,
   Delete
-} from '@/api/basic_management/parts-management'
+} from '@/api/basic_management/performance_metrics'
 // import { Lines } from "@/api/basic_management/line-management";
 
 import waves from '@/directive/waves' // waves directive
@@ -299,10 +303,10 @@ export default {
       statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {
-        sn: null,
-        name: null,
-        indicatorsIds: null,
-        signalCode: null
+        signalCode: null,
+        max: null,
+        min: null,
+        name: null
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -377,10 +381,10 @@ export default {
     },
     resetTemp() {
       this.temp = {
-        sn: null,
-        name: null,
-        indicatorsIds: null,
-        signalCode: null
+        signalCode: null,
+        max: null,
+        min: null,
+        name: null
       }
     },
     handleCreate() {
@@ -394,16 +398,6 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          // 数组转字符串
-          let array = ''
-          for (let i = 0; i < this.temp.indicatorsIds.length; i++) {
-            if (this.temp.indicatorsIds.length === i + 1) {
-              array += this.temp.indicatorsIds[i]
-            } else {
-              array += this.temp.indicatorsIds[i] + ','
-            }
-          }
-          this.temp.indicatorsIds = array
           // this.temp.id = parseInt(Math.random() * 100) + 1024; // mock a id
           // this.temp.author = "vue-element-admin";
           createList(this.temp).then((res) => {
@@ -426,13 +420,6 @@ export default {
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
-      const arr = []
-      this.temp.indicatorsIds = this.temp.indicatorsIds.split(',')
-      for (let i = 0; i < this.temp.indicatorsIds.length; i++) {
-        arr.push(Number(this.temp.indicatorsIds[i]))
-      }
-      this.temp.indicatorsIds = arr
-      // this.temp.timestamp = new Date(this.temp.timestamp);
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -441,16 +428,6 @@ export default {
     },
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
-        let array = ''
-        for (let i = 0; i < this.temp.indicatorsIds.length; i++) {
-          if (this.temp.indicatorsIds.length === i + 1) {
-            array += this.temp.indicatorsIds[i]
-          } else {
-            array += this.temp.indicatorsIds[i] + ','
-          }
-        }
-        this.temp.indicatorsIds = array
-        console.log(this.temp.indicatorsIds)
         if (valid) {
           const tempData = Object.assign({}, this.temp)
           // tempData.timestamp = +new Date(tempData.timestamp); // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464

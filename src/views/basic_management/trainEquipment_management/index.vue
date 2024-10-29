@@ -4,7 +4,12 @@
       <el-form :inline="true">
         <el-form-item label="线路">
           <el-select v-model="listQuery.lineName" placeholder="请选择线路">
-            <el-option v-for="item in line_list" :key="item.id" :label="item.name" :value="item.name" />
+            <el-option
+              v-for="item in line_list"
+              :key="item.id"
+              :label="item.name"
+              :value="item.name"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="列车号">
@@ -38,7 +43,13 @@
             新增
           </el-button>
 
-          <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
+          <el-button
+            v-waves
+            class="filter-item"
+            type="primary"
+            icon="el-icon-search"
+            @click="handleFilter"
+          >
             搜索
           </el-button>
         </el-form-item>
@@ -68,32 +79,77 @@
           <span>{{ row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="部件编号" min-width="110px" align="center">
+      <el-table-column label="设备编码" min-width="110px" align="center">
+        <template slot-scope="{ row }">
+          <span>{{ row.coachType }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="列车号" min-width="110px" align="center">
+        <template slot-scope="{ row }">
+          <span>{{ row.name }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="线网名称" min-width="110px" align="center">
+        <template slot-scope="{ row }">
+          <span>{{ row.wlname }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column
+        v-if="showReviewer"
+        label="中心名称"
+        min-width="110px"
+        align="center"
+      >
+        <template slot-scope="{ row }" align="center">
+          <span style="color: red">{{ row.reviewer }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="线路名称" min-width="80px" align="center">
+        <template slot-scope="{ row }">
+          <span>{{ row.lineName }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="车品类型" min-width="80px" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.sn }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="名称" min-width="110px" align="center">
-        <template slot-scope="{ row }" align="center">
-          <span>{{ row.name }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="关联性能指标id" min-width="80px" align="center">
+      <el-table-column label="车厢号" min-width="80px" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.indicatorsIds }}</span>
+          <span>{{ row.chexhao }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="信号量编码" min-width="80px" align="center">
+      <el-table-column label="列车类型" min-width="80px" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.signalCode }}</span>
+          <span>{{ row.lieleix }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" min-width="230" class-name="small-padding fixed-width">
+      <el-table-column label="机组数量" min-width="80px" align="center">
+        <template slot-scope="{ row }">
+          <span>{{ row.trainNum }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="空调类型" min-width="80px" align="center">
+        <template slot-scope="{ row }">
+          <span>{{ row.ktiaoleix }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column
+        label="操作"
+        align="center"
+        min-width="230"
+        class-name="small-padding fixed-width"
+      >
         <template slot-scope="{ row, $index }">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             修改
           </el-button>
-          <el-button v-if="row.status != 'deleted'" size="mini" type="danger" @click="handleDelete(row, row.id)">
+          <el-button
+            v-if="row.status != 'deleted'"
+            size="mini"
+            type="danger"
+            @click="handleDelete(row, row.id)"
+          >
             删除
           </el-button>
         </template>
@@ -117,33 +173,49 @@
         label-width="70px"
         style="width: 400px; margin-left: 50px"
       >
-        <el-form-item label="部件编码" prop="coachType" label-width="120px">
-          <el-input v-model="temp.sn" placeholder="请输入部件编码" />
+        <el-form-item label="设备编码" prop="coachType" label-width="100px">
+          <el-input v-model="temp.coachType" placeholder="请输入设备编码" />
         </el-form-item>
-        <el-form-item label="部件名称" label-width="120px">
-          <el-input v-model="temp.name" placeholder="请输入部件名称" />
+        <el-form-item label="列车号" label-width="100px">
+          <el-input v-model="temp.name" placeholder="请输入网线名称" />
         </el-form-item>
-        <el-form-item label="关联性能指标id" label-width="120px">
-          <!-- <el-input v-model="temp.indicatorsIds" placeholder="请输入关联性能指标id" /> -->
-          <el-select v-model="temp.indicatorsIds" multiple collapse-tags placeholder="请选择关联性能指标">
-            <el-option v-for="item in parts_options" :key="item.value" :label="item.label" :value="item.value" />
-          </el-select>
+        <el-form-item label="线路名称" label-width="100px">
+          <el-input v-model="temp.lineName" placeholder="请输入网线名称" />
         </el-form-item>
-        <el-form-item label="信号量编码" label-width="120px">
-          <el-input v-model="temp.signalCode" placeholder="请输入信号量编码" />
+        <el-form-item label="车品类型" label-width="100px">
+          <el-input v-model="temp.sn" placeholder="请输入车品类型" />
         </el-form-item>
+        <!-- <el-form-item label="列车类型" label-width="100px" >
+            <el-input v-model="temp.lcleix" placeholder="请输入列车类型" />
+          </el-form-item> -->
+        <el-form-item label="机组数量" label-width="100px">
+          <el-input v-model="temp.trainNum" placeholder="请输入机组数量" />
+        </el-form-item>
+        <!-- <el-form-item label="空调类型" label-width="100px" >
+            <el-input v-model="temp.ktiao" placeholder="请输入空调类型" />
+          </el-form-item> -->
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
           {{ $t("table.cancel") }}
         </el-button>
-        <el-button type="primary" @click="dialogStatus === 'create' ? createData() : updateData()">
+        <el-button
+          type="primary"
+          @click="dialogStatus === 'create' ? createData() : updateData()"
+        >
           {{ $t("table.confirm") }}
         </el-button>
       </div>
     </el-dialog>
+
     <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
-      <el-table :data="pvData" border fit highlight-current-row style="width: 100%">
+      <el-table
+        :data="pvData"
+        border
+        fit
+        highlight-current-row
+        style="width: 100%"
+      >
         <el-table-column prop="key" label="Channel" />
         <el-table-column prop="pv" label="Pv" />
       </el-table>
@@ -158,15 +230,21 @@
 
 <script>
 import {
+  // fetchList,
   fetchPv
+  // createArticle,
+  // updateArticle,
 } from '@/api/article'
-import {
-  fetchList,
-  createList,
-  Update,
-  Delete
-} from '@/api/basic_management/parts-management'
-// import { Lines } from "@/api/basic_management/line-management";
+//   import {
+//     // getList,
+//     createList,
+//     Update,
+//     Delete,
+//   } from "@/api/basic_management/parts-management";
+// 设备管理
+import { getList, createList, Update, Delete } from '@/api/basic_management/equipment_management'
+
+import { Lines } from '@/api/basic_management/line-management'
 
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
@@ -186,7 +264,7 @@ const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
 }, {})
 
 export default {
-  name: 'Parts',
+  name: 'ComplexTable',
   components: { Pagination },
   directives: { waves },
   filters: {
@@ -207,24 +285,7 @@ export default {
       // 地址选择器
       pcTextArr,
       selectedOptions: [],
-      parts_options: [
-        {
-          value: 1,
-          label: '黄金糕'
-        }, {
-          value: 2,
-          label: '双皮奶'
-        }, {
-          value: 3,
-          label: '蚵仔煎'
-        }, {
-          value: 4,
-          label: '龙须面'
-        }, {
-          value: 5,
-          label: '北京烤鸭'
-        }
-      ],
+
       tableKey: 0,
       parts_list: [
         {
@@ -299,10 +360,12 @@ export default {
       statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {
-        sn: null,
-        name: null,
-        indicatorsIds: null,
-        signalCode: null
+        coachType: '',
+        // id: "",
+        lineName: '',
+        name: '',
+        sn: '',
+        trainNum: ''
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -335,20 +398,19 @@ export default {
     // 获取表格数据
     getList() {
       this.listLoading = true
-      fetchList(this.listQuery).then((response) => {
+      getList(this.listQuery).then((response) => {
         this.parts_list = response.data
-        console.log('获取部件管理', this.parts_list)
-
+        console.log('设备数据', this.parts_list)
         this.total = response.total
         this.listLoading = false
       })
     },
     // 获取所有线路
     getLines() {
-      // Lines().then((response) => {
-      //   console.log("线路信息", response);
-      //   this.line_list = response.data;
-      // });
+      Lines().then((response) => {
+        console.log('线路信息', response)
+        this.line_list = response.data
+      })
     },
     handleFilter() {
       this.listQuery.pageIndex = 1
@@ -377,10 +439,12 @@ export default {
     },
     resetTemp() {
       this.temp = {
-        sn: null,
-        name: null,
-        indicatorsIds: null,
-        signalCode: null
+        coachType: '',
+        // id: "",
+        lineName: '',
+        name: '',
+        sn: '',
+        trainNum: ''
       }
     },
     handleCreate() {
@@ -394,16 +458,6 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          // 数组转字符串
-          let array = ''
-          for (let i = 0; i < this.temp.indicatorsIds.length; i++) {
-            if (this.temp.indicatorsIds.length === i + 1) {
-              array += this.temp.indicatorsIds[i]
-            } else {
-              array += this.temp.indicatorsIds[i] + ','
-            }
-          }
-          this.temp.indicatorsIds = array
           // this.temp.id = parseInt(Math.random() * 100) + 1024; // mock a id
           // this.temp.author = "vue-element-admin";
           createList(this.temp).then((res) => {
@@ -426,13 +480,7 @@ export default {
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
-      const arr = []
-      this.temp.indicatorsIds = this.temp.indicatorsIds.split(',')
-      for (let i = 0; i < this.temp.indicatorsIds.length; i++) {
-        arr.push(Number(this.temp.indicatorsIds[i]))
-      }
-      this.temp.indicatorsIds = arr
-      // this.temp.timestamp = new Date(this.temp.timestamp);
+      this.temp.timestamp = new Date(this.temp.timestamp)
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -441,16 +489,6 @@ export default {
     },
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
-        let array = ''
-        for (let i = 0; i < this.temp.indicatorsIds.length; i++) {
-          if (this.temp.indicatorsIds.length === i + 1) {
-            array += this.temp.indicatorsIds[i]
-          } else {
-            array += this.temp.indicatorsIds[i] + ','
-          }
-        }
-        this.temp.indicatorsIds = array
-        console.log(this.temp.indicatorsIds)
         if (valid) {
           const tempData = Object.assign({}, this.temp)
           // tempData.timestamp = +new Date(tempData.timestamp); // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
@@ -542,9 +580,10 @@ export default {
 }
 </script>
 
-<style>
-/* 调整地址选择器高度 */
-.lin_management .el-input__inner {
-  height: 32px;
-}
-</style>
+  <style>
+  /* 调整地址选择器高度 */
+  .lin_management .el-input__inner {
+    height: 32px;
+  }
+  </style>
+

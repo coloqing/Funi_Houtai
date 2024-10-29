@@ -68,24 +68,19 @@
           <span>{{ row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="部件编号" min-width="110px" align="center">
+      <el-table-column label="设备编码" min-width="110px" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.sn }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="名称" min-width="110px" align="center">
-        <template slot-scope="{ row }" align="center">
+      <el-table-column label="设备名称" min-width="110px" align="center">
+        <template slot-scope="{ row }">
           <span>{{ row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="关联性能指标id" min-width="80px" align="center">
+      <el-table-column label="关联部件" min-width="110px" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.indicatorsIds }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="信号量编码" min-width="80px" align="center">
-        <template slot-scope="{ row }">
-          <span>{{ row.signalCode }}</span>
+          <span>{{ row.componentIds }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" min-width="230" class-name="small-padding fixed-width">
@@ -93,7 +88,12 @@
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             修改
           </el-button>
-          <el-button v-if="row.status != 'deleted'" size="mini" type="danger" @click="handleDelete(row, row.id)">
+          <el-button
+            v-if="row.status != 'deleted'"
+            size="mini"
+            type="danger"
+            @click="handleDelete(row, row.id)"
+          >
             删除
           </el-button>
         </template>
@@ -117,20 +117,21 @@
         label-width="70px"
         style="width: 400px; margin-left: 50px"
       >
-        <el-form-item label="部件编码" prop="coachType" label-width="120px">
-          <el-input v-model="temp.sn" placeholder="请输入部件编码" />
+        <el-form-item label="设备编码" prop="coachType" label-width="100px">
+          <el-input v-model="temp.sn" placeholder="请输入设备编码" />
         </el-form-item>
-        <el-form-item label="部件名称" label-width="120px">
-          <el-input v-model="temp.name" placeholder="请输入部件名称" />
+        <el-form-item label="设备名称" label-width="100px">
+          <el-input v-model="temp.name" placeholder="请输入设备名称" />
         </el-form-item>
-        <el-form-item label="关联性能指标id" label-width="120px">
-          <!-- <el-input v-model="temp.indicatorsIds" placeholder="请输入关联性能指标id" /> -->
-          <el-select v-model="temp.indicatorsIds" multiple collapse-tags placeholder="请选择关联性能指标">
-            <el-option v-for="item in parts_options" :key="item.value" :label="item.label" :value="item.value" />
+        <el-form-item label="关联部件" label-width="100px">
+          <el-select v-model="temp.componentIds" multiple collapse-tags placeholder="请选择关联部件">
+            <el-option
+              v-for="item in parts_options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
           </el-select>
-        </el-form-item>
-        <el-form-item label="信号量编码" label-width="120px">
-          <el-input v-model="temp.signalCode" placeholder="请输入信号量编码" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -142,6 +143,7 @@
         </el-button>
       </div>
     </el-dialog>
+
     <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
       <el-table :data="pvData" border fit highlight-current-row style="width: 100%">
         <el-table-column prop="key" label="Channel" />
@@ -160,13 +162,11 @@
 import {
   fetchPv
 } from '@/api/article'
-import {
-  fetchList,
-  createList,
-  Update,
-  Delete
-} from '@/api/basic_management/parts-management'
-// import { Lines } from "@/api/basic_management/line-management";
+
+// 设备管理
+import { getList, createList, Update, Delete } from '@/api/basic_management/equipment_management'
+
+import { Lines } from '@/api/basic_management/line-management'
 
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
@@ -186,7 +186,7 @@ const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
 }, {})
 
 export default {
-  name: 'Parts',
+  name: 'ComplexTable',
   components: { Pagination },
   directives: { waves },
   filters: {
@@ -207,6 +207,7 @@ export default {
       // 地址选择器
       pcTextArr,
       selectedOptions: [],
+      // 关联部件
       parts_options: [
         {
           value: 1,
@@ -260,35 +261,11 @@ export default {
       },
 
       // ---------------------
-      // arr: [
-      //   {
-      //     id: 1,
-      //     path: "/root",
-      //     component: "root",
-      //     redirect: "1",
-      //     alwaysShow: true,
-      //     meta: { title: "1", icon: "1" },
-      //     children: [
-      //       {
-      //         id: 2,
-      //         path: "/2",
-      //         component: "root",
-      //         redirect: "2",
-      //         alwaysShow: true,
-      //         meta: { title: "2", icon: "2" },
-      //       },
-      //     ],
-      //   },
-      // ],
       listQuery: {
         pageIndex: 1,
         pageRow: 10,
         lineName: undefined,
         trainNum: undefined
-        // importance: undefined,
-        // title: undefined,
-        // type: undefined,
-        // sort: "+id",
       },
       importanceOptions: [1, 2, 3],
       calendarTypeOptions,
@@ -299,10 +276,9 @@ export default {
       statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {
-        sn: null,
-        name: null,
-        indicatorsIds: null,
-        signalCode: null
+        name: '',
+        sn: '',
+        componentIds: ''
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -335,20 +311,19 @@ export default {
     // 获取表格数据
     getList() {
       this.listLoading = true
-      fetchList(this.listQuery).then((response) => {
+      getList(this.listQuery).then((response) => {
         this.parts_list = response.data
-        console.log('获取部件管理', this.parts_list)
-
+        console.log('设备数据', this.parts_list)
         this.total = response.total
         this.listLoading = false
       })
     },
     // 获取所有线路
     getLines() {
-      // Lines().then((response) => {
-      //   console.log("线路信息", response);
-      //   this.line_list = response.data;
-      // });
+      Lines().then((response) => {
+        console.log('线路信息', response)
+        this.line_list = response.data
+      })
     },
     handleFilter() {
       this.listQuery.pageIndex = 1
@@ -377,10 +352,9 @@ export default {
     },
     resetTemp() {
       this.temp = {
-        sn: null,
-        name: null,
-        indicatorsIds: null,
-        signalCode: null
+        name: '',
+        sn: '',
+        componentIds: ''
       }
     },
     handleCreate() {
@@ -394,18 +368,19 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          // 数组转字符串
-          let array = ''
-          for (let i = 0; i < this.temp.indicatorsIds.length; i++) {
-            if (this.temp.indicatorsIds.length === i + 1) {
-              array += this.temp.indicatorsIds[i]
-            } else {
-              array += this.temp.indicatorsIds[i] + ','
-            }
-          }
-          this.temp.indicatorsIds = array
           // this.temp.id = parseInt(Math.random() * 100) + 1024; // mock a id
           // this.temp.author = "vue-element-admin";
+          // 数组转字符串
+          let array = ''
+          for (let i = 0; i < this.temp.componentIds.length; i++) {
+            if (this.temp.componentIds.length === i + 1) {
+              array += this.temp.componentIds[i]
+            } else {
+              array += this.temp.componentIds[i] + ','
+            }
+          }
+          this.temp.componentIds = array
+
           createList(this.temp).then((res) => {
             console.log('新增', res)
             if (res.success) {
@@ -427,30 +402,31 @@ export default {
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
       const arr = []
-      this.temp.indicatorsIds = this.temp.indicatorsIds.split(',')
-      for (let i = 0; i < this.temp.indicatorsIds.length; i++) {
-        arr.push(Number(this.temp.indicatorsIds[i]))
+      this.temp.componentIds = this.temp.componentIds.split(',')
+      for (let i = 0; i < this.temp.componentIds.length; i++) {
+        arr.push(Number(this.temp.componentIds[i]))
       }
-      this.temp.indicatorsIds = arr
+      this.temp.componentIds = arr
       // this.temp.timestamp = new Date(this.temp.timestamp);
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
+      // this.$nextTick(() => {
+      //     this.$refs["dataForm"].clearValidate();
+      // });
     },
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         let array = ''
-        for (let i = 0; i < this.temp.indicatorsIds.length; i++) {
-          if (this.temp.indicatorsIds.length === i + 1) {
-            array += this.temp.indicatorsIds[i]
+        for (let i = 0; i < this.temp.componentIds.length; i++) {
+          if (this.temp.componentIds.length === i + 1) {
+            array += this.temp.componentIds[i]
           } else {
-            array += this.temp.indicatorsIds[i] + ','
+            array += this.temp.componentIds[i] + ','
           }
         }
-        this.temp.indicatorsIds = array
-        console.log(this.temp.indicatorsIds)
+        this.temp.componentIds = array
+        console.log(this.temp.componentIds)
+
         if (valid) {
           const tempData = Object.assign({}, this.temp)
           // tempData.timestamp = +new Date(tempData.timestamp); // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
@@ -475,7 +451,7 @@ export default {
     },
     handleDelete(row, index) {
       this.$confirm(
-        '此操作将永久删除id为 ' + index + ' 的线路, 是否继续?',
+        '此操作将永久删除序号为 ' + index + ' 的设备, 是否继续?',
         '提示',
         {
           confirmButtonText: '确定',
@@ -545,6 +521,6 @@ export default {
 <style>
 /* 调整地址选择器高度 */
 .lin_management .el-input__inner {
-  height: 32px;
+    height: 32px;
 }
 </style>

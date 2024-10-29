@@ -1,16 +1,16 @@
-import Vue from "vue";
-import Router from "vue-router";
+import Vue from 'vue'
+import Router from 'vue-router'
 
-Vue.use(Router);
+Vue.use(Router)
 
 /* Layout */
-import Layout from "@/layout";
+import Layout from '@/layout'
 
 /* Router Modules */
-import componentsRouter from "./modules/components";
-import chartsRouter from "./modules/charts";
-import tableRouter from "./modules/table";
-import nestedRouter from "./modules/nested";
+import componentsRouter from './modules/components'
+import chartsRouter from './modules/charts'
+import tableRouter from './modules/table'
+import nestedRouter from './modules/nested'
 /**
  * Note: sub-menu only appear when route children.length >= 1
  * Detail see: https://panjiachen.github.io/vue-element-admin-site/guide/essentials/router-and-nav.html
@@ -36,7 +36,7 @@ import nestedRouter from "./modules/nested";
 //     "path": "/basic_management",
 //     "component": "Layout",
 //     "redirect": "/line-management",
-//     "alwaysShow": true, 
+//     "alwaysShow": true,
 //     "meta": { "title": "基础管理", "icon": "el-icon-document" },
 //     "children": [
 //       {
@@ -69,7 +69,7 @@ import nestedRouter from "./modules/nested";
 //     "path": "/system_administration",
 //     "component": "Layout",
 //     "redirect": "/menu-management",
-//     "alwaysShow": true, 
+//     "alwaysShow": true,
 //     "meta": { "title": "系统管理", "icon": "el-icon-document" },
 //     "children": [
 //       {
@@ -100,7 +100,7 @@ import nestedRouter from "./modules/nested";
 //     "path": "/user_management",
 //     "component": "Layout",
 //     "redirect": "/user_management",
-//     "alwaysShow": true, 
+//     "alwaysShow": true,
 //     "meta": { "title": "用户管理", "icon": "el-icon-document" },
 //     "children": [
 //       {
@@ -120,140 +120,166 @@ import nestedRouter from "./modules/nested";
 export const constantRoutes = [
   /** 自定义路由===================**/
   {
-    path: "/basic_management",
+    path: '/basic_management',
     component: Layout,
-    redirect: "/line-management",
-    alwaysShow: true, 
-    meta: { title: "基础管理", icon: "el-icon-document" },
+    redirect: '/line-management',
+    alwaysShow: true,
+    meta: { title: '基础管理', icon: 'el-icon-document' },
     children: [
       {
-        path: "line",
+        path: 'line',
         component: () =>
-          import("@/views/basic_management/line-management/index"),
-        name: "line",
-        meta: { title: "线路管理", roles: ["editor"] },
+          import('@/views/basic_management/line-management/index'),
+        name: 'line',
+        meta: { title: '线路管理', roles: ['editor'] }
       },
       {
-        path: "train",
+        path: 'train',
         component: () =>
-          import("@/views/basic_management/train-management/index"),
-        name: "train-management",
-        meta: { title: "列车管理", roles: ["admin", "editor"] },
+          import('@/views/basic_management/train-management/index'),
+        name: 'train-management',
+        meta: { title: '列车管理', roles: ['admin', 'editor'] }
       },
       {
-        path: "carriage",
+        path: 'carriage',
         component: () =>
-          import("@/views/basic_management/carriage-management/index"),
-        name: "carriage-management",
-        meta: { title: "车厢管理", roles: ["admin", "editor"] },
+          import('@/views/basic_management/carriage-management/index'),
+        name: 'carriage-management',
+        meta: { title: '车厢管理', roles: ['admin', 'editor'] }
       },
       {
-        path: "parts",
+        path: 'parts',
         component: () =>
-          import("@/views/basic_management/parts-management/index"),
-        name: "parts-management",
-        meta: { title: "设备部件管理", roles: ["admin", "editor"] },
+          import('@/views/basic_management/parts-management/index'),
+        name: 'parts-management',
+        meta: { title: '部件管理', roles: ['admin', 'editor'] }
       },
-    ],
+      {
+        path: 'equipment',
+        component: () =>
+          import('@/views/basic_management/equipment_management/index'),
+        name: 'equipment_management',
+        meta: { title: '设备管理', roles: ['admin', 'editor'] }
+      },
+      {
+        path: 'performance',
+        component: () =>
+          import('@/views/basic_management/performance_metrics/index'),
+        name: 'performance_metrics',
+        meta: { title: '性能指标', roles: ['admin', 'editor'] }
+      },
+      {
+        path: 'semaphore',
+        component: () =>
+          import('@/views/basic_management/semaphore/index'),
+        name: 'semaphore',
+        meta: { title: '信号量', roles: ['admin', 'editor'] }
+      },
+      {
+        path: 'trainEquipment',
+        component: () =>
+          import('@/views/basic_management/trainEquipment_management/index'),
+        name: 'trainEquipment_management',
+        meta: { title: '列车设备管理', roles: ['admin', 'editor'] }
+      }
+
+    ]
   },
   {
-    path: "/system_administration",
+    path: '/system_administration',
     component: Layout,
-    redirect: "/menu-management",
-    alwaysShow: true, 
-    meta: { title: "系统管理", icon: "el-icon-document" },
+    redirect: '/menu-management',
+    alwaysShow: true,
+    meta: { title: '系统管理', icon: 'el-icon-document' },
     children: [
       {
-        path: "munu",
+        path: 'munu',
         component: () =>
-          import("@/views/system_administration/menu_management/index"),
-        name: "menu_management",
-        meta: { title: "菜单管理", roles: ["admin", "editor"] },
+          import('@/views/system_administration/menu_management/index'),
+        name: 'menu_management',
+        meta: { title: '菜单管理', roles: ['admin', 'editor'] }
       },
       {
-        path: "role",
+        path: 'role',
         component: () =>
-          import("@/views/system_administration/role_management/index"),
-        name: "role_management",
-        meta: { title: "角色管理", roles: ["admin", "editor"] },
+          import('@/views/system_administration/role_management/index'),
+        name: 'role_management',
+        meta: { title: '角色管理', roles: ['admin', 'editor'] }
       },
       {
-        path: "organizational",
+        path: 'organizational',
         component: () =>
           import(
-            "@/views/system_administration/organizational_management/index"
+            '@/views/system_administration/organizational_management/index'
           ),
-        name: "organizational_management",
-        meta: { title: "组织结构管理", roles: ["admin", "editor"] },
+        name: 'organizational_management',
+        meta: { title: '组织结构管理', roles: ['admin', 'editor'] }
       },
       {
-        path: "configuration",
+        path: 'configuration',
         component: () =>
           import(
-            "@/views/system_administration/configuration_management/index"
+            '@/views/system_administration/configuration_management/index'
           ),
-        name: "configuration_management",
-        meta: { title: "系统配置管理", roles: ["admin", "editor"] },
-      },
-    ],
+        name: 'configuration_management',
+        meta: { title: '系统配置管理', roles: ['admin', 'editor'] }
+      }
+    ]
   },
   {
-    path: "/user_management",
+    path: '/user_management',
     component: Layout,
-    redirect: "/user_management",
-    alwaysShow: true, 
-    meta: { title: "用户管理", icon: "el-icon-document" },
+    redirect: '/user_management',
+    alwaysShow: true,
+    meta: { title: '用户管理', icon: 'el-icon-document' },
     children: [
       {
-        path: "user",
-        component: () => import("@/views/user_management/index"),
-        name: "user_management",
-        meta: { title: "用户管理", roles: ["admin", "editor"] },
-      },
-    ],
+        path: 'user',
+        component: () => import('@/views/user_management/index'),
+        name: 'user_management',
+        meta: { title: '用户管理', roles: ['admin', 'editor'] }
+      }
+    ]
   },
   /** 自定义路由=========over==========**/
   {
-    path: "/login",
-    component: () => import("@/views/login/index"),
-    hidden: true,
+    path: '/login',
+    component: () => import('@/views/login/index'),
+    hidden: true
   },
   {
-    path: "/auth-redirect",
-    component: () => import("@/views/login/auth-redirect"),
-    hidden: true,
+    path: '/auth-redirect',
+    component: () => import('@/views/login/auth-redirect'),
+    hidden: true
   },
   {
-    path: "/404",
-    component: () => import("@/views/error-page/404"),
-    hidden: true,
+    path: '/404',
+    component: () => import('@/views/error-page/404'),
+    hidden: true
   },
   {
-    path: "/401",
-    component: () => import("@/views/error-page/401"),
-    hidden: true,
+    path: '/401',
+    component: () => import('@/views/error-page/401'),
+    hidden: true
   },
   {
-    path: "/",
+    path: '/',
     component: Layout,
-    redirect: "/basic_management/line",
+    redirect: '/basic_management/line'
   },
-  { path: "*", redirect: "/404", hidden: true },
+  { path: '*', redirect: '/404', hidden: true }
 
-
-
-
-    // {
-    //   path: "/redirect",
-    //   component: Layout,
-    //   hidden: true,
-    //   children: [
-    //     {
-    //       path: "/redirect/:path(.*)",
-    //       component: () => import("@/views/redirect/index"),
-    //     },
-    //   ],
-    // },
+  // {
+  //   path: "/redirect",
+  //   component: Layout,
+  //   hidden: true,
+  //   children: [
+  //     {
+  //       path: "/redirect/:path(.*)",
+  //       component: () => import("@/views/redirect/index"),
+  //     },
+  //   ],
+  // },
 
   //   {
   //     path: "/documentation",
@@ -294,12 +320,12 @@ export const constantRoutes = [
   //       },
   //     ],
   //   },
-  ];
+]
 
-  // /**
-  //  * asyncRoutes
-  //  * the routes that need to be dynamically loaded based on user roles
-  //  */
+// /**
+//  * asyncRoutes
+//  * the routes that need to be dynamically loaded based on user roles
+//  */
 
 //   export const asyncRoutes = [
 //     {
@@ -581,15 +607,15 @@ const createRouter = () =>
   new Router({
     mode: 'history', // require service support
     scrollBehavior: () => ({ y: 0 }),
-    routes: constantRoutes,
-  });
+    routes: constantRoutes
+  })
 
-const router = createRouter();
+const router = createRouter()
 
 // Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
 export function resetRouter() {
-  const newRouter = createRouter();
-  router.matcher = newRouter.matcher; // reset router
+  const newRouter = createRouter()
+  router.matcher = newRouter.matcher // reset router
 }
 
-export default router;
+export default router

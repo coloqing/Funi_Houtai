@@ -2,15 +2,15 @@
   <div class="app-container lin_management">
     <div class="filter-container" style="display: flex; align-items: baseline">
       <el-form :inline="true">
-        <el-form-item label="线路">
+        <!-- <el-form-item label="线路">
           <el-select v-model="listQuery.lineName" placeholder="请选择线路">
             <el-option v-for="item in line_list" :key="item.id" :label="item.name" :value="item.name" />
           </el-select>
-        </el-form-item>
-        <el-form-item label="列车号">
+        </el-form-item> -->
+        <el-form-item label="指标名称">
           <el-input
-            v-model="listQuery.trainNum"
-            placeholder="列车号"
+            v-model="listQuery.name"
+            placeholder="请输入指标名称"
             style="width: 200px; margin-right: 10px"
             class="filter-item"
             @keyup.enter.native="handleFilter"
@@ -59,7 +59,6 @@
       <el-table-column
         label="序号"
         prop="id"
-        sortable="custom"
         align="center"
         min-width="80"
         :class-name="getSortClass('id')"
@@ -133,7 +132,7 @@
             </el-option>
           </el-select>-->
           <el-select v-model="temp.signalCode" filterable placeholder="请选择信号量编码">
-            <el-option v-for="item in parts_options" :key="item.value" :label="item.label" :value="item.value" />
+            <el-option v-for="item in parts_options" :key="item.code" :label="item.name" :value="item.code" />
           </el-select>
         </el-form-item>
       </el-form>
@@ -165,11 +164,12 @@ import {
   fetchPv
 } from '@/api/article'
 import {
-  fetchList,
+  fetchList_Indicators,
   createList,
   Update,
   Delete
 } from '@/api/basic_management/performance_metrics'
+import { fetchList_Signal } from '@/api/basic_management/semaphore'
 // import { Lines } from "@/api/basic_management/line-management";
 
 import waves from '@/directive/waves' // waves directive
@@ -339,20 +339,20 @@ export default {
     // 获取表格数据
     getList() {
       this.listLoading = true
-      fetchList(this.listQuery).then((response) => {
+      fetchList_Indicators(this.listQuery).then((response) => {
         this.parts_list = response.data
-        console.log('获取部件管理', this.parts_list)
+        // console.log('获取部件管理', this.parts_list)
 
         this.total = response.total
         this.listLoading = false
       })
     },
-    // 获取所有线路
+    // 获取所有信号量
     getLines() {
-      // Lines().then((response) => {
-      //   console.log("线路信息", response);
-      //   this.line_list = response.data;
-      // });
+      fetchList_Signal().then((response) => {
+        // console.log("信号量", response);
+        this.parts_options = response.data;
+      });
     },
     handleFilter() {
       this.listQuery.pageIndex = 1
@@ -401,7 +401,7 @@ export default {
           // this.temp.id = parseInt(Math.random() * 100) + 1024; // mock a id
           // this.temp.author = "vue-element-admin";
           createList(this.temp).then((res) => {
-            console.log('新增', res)
+            // console.log('新增', res)
             if (res.success) {
               this.dialogFormVisible = false
               this.getList()
@@ -432,7 +432,7 @@ export default {
           const tempData = Object.assign({}, this.temp)
           // tempData.timestamp = +new Date(tempData.timestamp); // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
           Update(tempData).then((res) => {
-            console.log('修改设备信息', res)
+            // console.log('修改设备信息', res)
             // this.getList();
             if (res.success) {
               this.dialogFormVisible = false

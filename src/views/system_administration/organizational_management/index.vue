@@ -189,7 +189,7 @@ export default {
       this.listLoading = true;
       getOrgStructure().then((response) => {
         if (response.success) {
-          console.log("组织结构管理list:", response);
+          // console.log("组织结构管理list:", response);
           this.tableData = response.data;
           // this.total = response.data.length;
           this.listLoading = false;
@@ -213,7 +213,7 @@ export default {
             this.temps.parentId = 0;
           }
           createOrgStructure(this.temps).then((res) => {
-            console.log("新增部门", res);
+            // console.log("新增部门", res);
             this.getList();
             this.dialogVisible = false;
             this.$notify({
@@ -233,7 +233,7 @@ export default {
       // let tmp = this.temps.province;
       // this.temps.province = [tmp, this.temps.city];
       // this.temp.timestamp = new Date(this.temp.timestamp);
-      console.log("操作的对象", this.temps);
+      // console.log("操作的对象", this.temps);
       this.dialogStatus = "update";
       this.dialogVisible = true;
     },
@@ -242,7 +242,7 @@ export default {
       this.$refs["dataForm"].validate((valid) => {
         if (valid) {
           Update(this.temps).then((res) => {
-            console.log("修改部门", res);
+            // console.log("修改部门", res);
             this.getList();
             this.dialogVisible = false;
             this.$notify({

@@ -124,63 +124,63 @@ export const constantRoutes = [
     component: Layout,
     redirect: '/line-management',
     alwaysShow: true,
-    meta: { title: '基础管理', icon: 'el-icon-document' },
+    meta: { title: 'basicManagement', icon: 'el-icon-menu' },
     children: [
       {
         path: 'line',
         component: () =>
           import('@/views/basic_management/line-management/index'),
         name: 'line',
-        meta: { title: '线路管理', roles: ['editor'] }
+        meta: { title: 'lineManagement', roles: ['editor'] }
       },
       {
         path: 'train',
         component: () =>
           import('@/views/basic_management/train-management/index'),
         name: 'train-management',
-        meta: { title: '列车管理', roles: ['admin', 'editor'] }
+        meta: { title: 'trainManagement', roles: ['admin', 'editor'] }
       },
       {
         path: 'carriage',
         component: () =>
           import('@/views/basic_management/carriage-management/index'),
         name: 'carriage-management',
-        meta: { title: '车厢管理', roles: ['admin', 'editor'] }
-      },
-      {
-        path: 'parts',
-        component: () =>
-          import('@/views/basic_management/parts-management/index'),
-        name: 'parts-management',
-        meta: { title: '部件管理', roles: ['admin', 'editor'] }
+        meta: { title: 'carriageManagement', roles: ['admin', 'editor'] }
       },
       {
         path: 'equipment',
         component: () =>
           import('@/views/basic_management/equipment_management/index'),
         name: 'equipment_management',
-        meta: { title: '设备管理', roles: ['admin', 'editor'] }
+        meta: { title: 'equipmentManagement', roles: ['admin', 'editor'] }
+      },
+      {
+        path: 'parts',
+        component: () =>
+          import('@/views/basic_management/parts-management/index'),
+        name: 'parts-management',
+        meta: { title: 'partsManagement', roles: ['admin', 'editor'] }
       },
       {
         path: 'performance',
         component: () =>
           import('@/views/basic_management/performance_metrics/index'),
         name: 'performance_metrics',
-        meta: { title: '性能指标', roles: ['admin', 'editor'] }
+        meta: { title: 'performanceMetrics', roles: ['admin', 'editor'] }
       },
       {
         path: 'semaphore',
         component: () =>
           import('@/views/basic_management/semaphore/index'),
         name: 'semaphore',
-        meta: { title: '信号量', roles: ['admin', 'editor'] }
+        meta: { title: 'semaphore', roles: ['admin', 'editor'] }
       },
       {
         path: 'trainEquipment',
         component: () =>
           import('@/views/basic_management/trainEquipment_management/index'),
         name: 'trainEquipment_management',
-        meta: { title: '列车设备管理', roles: ['admin', 'editor'] }
+        meta: { title: 'lineEquipmentManagement', roles: ['admin', 'editor'] }
       }
 
     ]
@@ -190,21 +190,21 @@ export const constantRoutes = [
     component: Layout,
     redirect: '/menu-management',
     alwaysShow: true,
-    meta: { title: '系统管理', icon: 'el-icon-document' },
+    meta: { title: 'systemManagement', icon: 'el-icon-s-tools' },
     children: [
       {
         path: 'munu',
         component: () =>
           import('@/views/system_administration/menu_management/index'),
         name: 'menu_management',
-        meta: { title: '菜单管理', roles: ['admin', 'editor'] }
+        meta: { title: 'menuManagement', roles: ['admin', 'editor'] }
       },
       {
         path: 'role',
         component: () =>
           import('@/views/system_administration/role_management/index'),
         name: 'role_management',
-        meta: { title: '角色管理', roles: ['admin', 'editor'] }
+        meta: { title: 'roleManagement', roles: ['admin', 'editor'] }
       },
       {
         path: 'organizational',
@@ -213,7 +213,7 @@ export const constantRoutes = [
             '@/views/system_administration/organizational_management/index'
           ),
         name: 'organizational_management',
-        meta: { title: '组织结构管理', roles: ['admin', 'editor'] }
+        meta: { title: 'organizationManagement', roles: ['admin', 'editor'] }
       },
       {
         path: 'configuration',
@@ -222,7 +222,7 @@ export const constantRoutes = [
             '@/views/system_administration/configuration_management/index'
           ),
         name: 'configuration_management',
-        meta: { title: '系统配置管理', roles: ['admin', 'editor'] }
+        meta: { title: 'configurationManagement', roles: ['admin', 'editor'] }
       }
     ]
   },
@@ -231,13 +231,13 @@ export const constantRoutes = [
     component: Layout,
     redirect: '/user_management',
     alwaysShow: true,
-    meta: { title: '用户管理', icon: 'el-icon-document' },
+    meta: { title: 'userManagement', icon: 'el-icon-user-solid' },
     children: [
       {
         path: 'user',
         component: () => import('@/views/user_management/index'),
         name: 'user_management',
-        meta: { title: '用户管理', roles: ['admin', 'editor'] }
+        meta: { title: 'userManagement', roles: ['admin', 'editor'] }
       }
     ]
   },

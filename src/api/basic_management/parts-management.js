@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 // 获取 部件管理
-export function fetchList(data) {
+export function fetchList_Component(data) {
   return request({
     url: '/api/Component',
     method: 'get',

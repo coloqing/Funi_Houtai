@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 // 获取 性能指标
-export function fetchList(data) {
+export function fetchList_Indicators(data) {
   return request({
     url: '/api/Indicators',
     method: 'get',

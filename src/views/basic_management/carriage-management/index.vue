@@ -355,9 +355,9 @@ export default {
         this.tableData.forEach((row) => {
           delete row.editable;
         });
-        console.log(this.tableData);
+        // console.log(this.tableData);
         updateMuch(this.tableData).then((response) => {
-            console.log('全部修改',response);
+            // console.log('全部修改',response);
             if (response.success) {
               this.$message({
                 type: "success",
@@ -393,7 +393,7 @@ export default {
     // 获取所有线路
     getLines() {
       Lines().then((response) => {
-        console.log("线路信息", response);
+        // console.log("线路信息", response);
         this.line_list = response.data;
       });
     },

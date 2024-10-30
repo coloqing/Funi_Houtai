@@ -1,8 +1,8 @@
 import request from '@/utils/request'
 // 获取 信号量
-export function getTrain(data) {
+export function fetchList_Signal(data) {
   return request({
-    url: '/api/Train',
+    url: '/api/Signal',
     method: 'get',
     params: data
   })
@@ -10,7 +10,7 @@ export function getTrain(data) {
 // 添加 信号量
 export function createList(data) {
   return request({
-    url: '/api/Indicators',
+    url: '/api/Signal',
     method: 'post',
     data: data
   })
@@ -18,7 +18,7 @@ export function createList(data) {
 // 修改 信号量
 export function Update(data) {
   return request({
-    url: '/api/Indicators/Update',
+    url: '/api/Signal/Update',
     method: 'post',
     data: data
   })
@@ -26,7 +26,7 @@ export function Update(data) {
 // 删除 信号量
 export function Delete(data) {
   return request({
-    url: '/api/Indicators/Delete',
+    url: '/api/Signal/Delete',
     method: 'post',
     data: data
   })

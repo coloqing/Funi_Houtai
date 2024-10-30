@@ -435,7 +435,7 @@ export default {
       this.$refs["dataForm"].validate((valid) => {
         if (valid) {
           addLines(this.temps).then((res) => {
-            console.log("新增线路", res);
+            // console.log("新增线路", res);
             this.getList();
             this.dialogFormVisible = false;
             this.$notify({
@@ -453,7 +453,7 @@ export default {
       let tmp = this.temps.province;
       this.temps.province = [tmp, this.temps.city];
       // this.temp.timestamp = new Date(this.temp.timestamp);
-      console.log("操作的对象", this.temp);
+      // console.log("操作的对象", this.temp);
       this.dialogStatus = "update";
       this.dialogFormVisible = true;
       this.$nextTick(() => {

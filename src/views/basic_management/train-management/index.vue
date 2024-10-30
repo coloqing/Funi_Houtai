@@ -257,12 +257,7 @@ export default {
       selectedOptions: [],
 
       tableKey: 0,
-      train_list: [
-        { id: "1", lineId: "G10001", name: "10001" },
-        { id: "2", lineId: "G10001", name: "10001" },
-        { id: "3", lineId: "G10001", name: "10001" },
-        { id: "4", lineId: "G10001", name: "10001" },
-      ],
+      train_list: [],
       line_list: null,
       total: 0,
       listLoading: true,
@@ -346,14 +341,14 @@ export default {
     // 获取所有线路
     getLines() {
       Lines().then((response) => {
-        console.log("线路信息", response);
+        // console.log("线路信息", response);
         this.line_list = response.data;
       });
     },
     handleFilter() {
       this.listQuery.pageIndex = 1;
       this.getList();
-      console.log("我要进行查询");
+      // console.log("我要进行查询");
     },
     handleModifyStatus(row, status) {
       this.$message({
@@ -410,7 +405,7 @@ export default {
           createTrain(this.temps).then((res) => {
             // this.list.unshift(this.temp);
             this.getList();
-            console.log("新增列车", res);
+            // console.log("新增列车", res);
             this.dialogFormVisible = false;
             this.$notify({
               title: "成功",

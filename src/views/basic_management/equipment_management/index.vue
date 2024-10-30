@@ -2,39 +2,27 @@
   <div class="app-container lin_management">
     <div class="filter-container" style="display: flex; align-items: baseline">
       <el-form :inline="true">
-        <el-form-item label="线路">
+        <!-- <el-form-item label="线路">
           <el-select v-model="listQuery.lineName" placeholder="请选择线路">
             <el-option v-for="item in line_list" :key="item.id" :label="item.name" :value="item.name" />
           </el-select>
+        </el-form-item> -->
+        <el-form-item label="设备名称">
+          <el-input v-model="listQuery.name" placeholder="请输入设备名称" style="width: 200px; margin-right: 10px"
+            class="filter-item" @keyup.enter.native="handleFilter" />
         </el-form-item>
-        <el-form-item label="列车号">
-          <el-input
-            v-model="listQuery.trainNum"
-            placeholder="列车号"
-            style="width: 200px; margin-right: 10px"
-            class="filter-item"
-            @keyup.enter.native="handleFilter"
-          />
+        <el-form-item label="设备编号">
+          <el-input v-model="listQuery.SN" placeholder="请输入设备编号" style="width: 200px; margin-right: 10px"
+            class="filter-item" @keyup.enter.native="handleFilter" />
         </el-form-item>
         <!-- 功能按钮 -->
         <el-form-item>
-          <el-button
-            v-waves
-            :loading="downloadLoading"
-            class="filter-item"
-            type="primary"
-            icon="el-icon-refresh"
-            @click="handleDownload"
-          >
+          <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-refresh"
+            @click="handleDownload">
             重置
           </el-button>
-          <el-button
-            class="filter-item"
-            style="margin-left: 10px"
-            type="primary"
-            icon="el-icon-edit"
-            @click="handleCreate"
-          >
+          <el-button class="filter-item" style="margin-left: 10px" type="primary" icon="el-icon-edit"
+            @click="handleCreate">
             新增
           </el-button>
 
@@ -45,25 +33,10 @@
       </el-form>
     </div>
 
-    <el-table
-      :key="tableKey"
-      v-loading="listLoading"
-      :data="parts_list"
-      border
-      :header-cell-style="{ backgroundColor: 'rgb(244, 243, 249)' }"
-      fit
-      highlight-current-row
-      style="width: 100%"
-      @sort-change="sortChange"
-    >
-      <el-table-column
-        label="序号"
-        prop="id"
-        sortable="custom"
-        align="center"
-        min-width="80"
-        :class-name="getSortClass('id')"
-      >
+    <el-table :key="tableKey" v-loading="listLoading" :data="parts_list" border
+      :header-cell-style="{ backgroundColor: 'rgb(244, 243, 249)' }" fit highlight-current-row style="width: 100%"
+      @sort-change="sortChange">
+      <el-table-column label="序号" prop="id" align="center" min-width="80" :class-name="getSortClass('id')">
         <template slot-scope="{ row }">
           <span>{{ row.id }}</span>
         </template>
@@ -78,9 +51,9 @@
           <span>{{ row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="关联部件" min-width="110px" align="center">
+      <el-table-column label="关联部件" min-width="150px" >
         <template slot-scope="{ row }">
-          <span>{{ row.componentIds }}</span>
+          <span>{{ parts_invert(row.componentIds) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" min-width="230" class-name="small-padding fixed-width">
@@ -88,35 +61,19 @@
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             修改
           </el-button>
-          <el-button
-            v-if="row.status != 'deleted'"
-            size="mini"
-            type="danger"
-            @click="handleDelete(row, row.id)"
-          >
+          <el-button v-if="row.status != 'deleted'" size="mini" type="danger" @click="handleDelete(row, row.id)">
             删除
           </el-button>
         </template>
       </el-table-column>
     </el-table>
 
-    <pagination
-      v-show="total > 0"
-      :total="total"
-      :page-index.sync="listQuery.pageIndex"
-      :page-row.sync="listQuery.pageRow"
-      @pagination="getList"
-    />
+    <pagination v-show="total > 0" :total="total" :page-index.sync="listQuery.pageIndex"
+      :page-row.sync="listQuery.pageRow" @pagination="getList" />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form
-        ref="dataForm"
-        :rules="rules"
-        :model="temps"
-        label-position="left"
-        label-width="70px"
-        style="width: 400px; margin-left: 50px"
-      >
+      <el-form ref="dataForm" :rules="rules" :model="temps" label-position="left" label-width="70px"
+        style="width: 400px; margin-left: 50px">
         <el-form-item label="设备编码" prop="coachType" label-width="100px">
           <el-input v-model="temp.sn" placeholder="请输入设备编码" />
         </el-form-item>
@@ -125,12 +82,7 @@
         </el-form-item>
         <el-form-item label="关联部件" label-width="100px">
           <el-select v-model="temp.componentIds" multiple collapse-tags placeholder="请选择关联部件">
-            <el-option
-              v-for="item in parts_options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
+            <el-option v-for="item in parts_options" :key="item.id" :label="item.name" :value="item.id" />
           </el-select>
         </el-form-item>
       </el-form>
@@ -164,9 +116,10 @@ import {
 } from '@/api/article'
 
 // 设备管理
-import { getList, createList, Update, Delete } from '@/api/basic_management/equipment_management'
-
-import { Lines } from '@/api/basic_management/line-management'
+import { getList_device, createList, Update, Delete } from '@/api/basic_management/equipment_management'
+//  部件管理查询
+import { fetchList_Component } from '@/api/basic_management/parts-management'
+// import { Lines } from '@/api/basic_management/line-management'
 
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
@@ -208,39 +161,9 @@ export default {
       pcTextArr,
       selectedOptions: [],
       // 关联部件
-      parts_options: [
-        {
-          value: 1,
-          label: '黄金糕'
-        }, {
-          value: 2,
-          label: '双皮奶'
-        }, {
-          value: 3,
-          label: '蚵仔煎'
-        }, {
-          value: 4,
-          label: '龙须面'
-        }, {
-          value: 5,
-          label: '北京烤鸭'
-        }
-      ],
+      parts_options: [],
       tableKey: 0,
-      parts_list: [
-        {
-          id: '1',
-          coachType: 'end',
-          name: 'G100001',
-          wlname: 'wlx',
-          lineName: '10001',
-          sn: '1',
-          chexhao: '01',
-          lieleix: 'A',
-          trainNum: '2',
-          ktiaoleix: 'M'
-        }
-      ],
+      parts_list: [],
       total: 0,
       listLoading: true,
       // 列车线路
@@ -264,8 +187,6 @@ export default {
       listQuery: {
         pageIndex: 1,
         pageRow: 10,
-        lineName: undefined,
-        trainNum: undefined
       },
       importanceOptions: [1, 2, 3],
       calendarTypeOptions,
@@ -304,26 +225,40 @@ export default {
     }
   },
   created() {
-    this.getList()
     this.getLines()
   },
   methods: {
     // 获取表格数据
     getList() {
       this.listLoading = true
-      getList(this.listQuery).then((response) => {
+      getList_device(this.listQuery).then((response) => {
         this.parts_list = response.data
-        console.log('设备数据', this.parts_list)
+        // console.log('设备数据', this.parts_list)
         this.total = response.total
         this.listLoading = false
       })
     },
-    // 获取所有线路
+    // 获取所有部件管理
     getLines() {
-      Lines().then((response) => {
-        console.log('线路信息', response)
-        this.line_list = response.data
+      fetchList_Component().then((response) => {
+        // console.log('获取所有部件管理', response)
+        this.parts_options = response.data
+        this.getList()
       })
+    },
+    // 关键部件转化文本 
+    parts_invert(ids) {
+      const idArray = ids.split(','); // 将字符串分割成数组  
+      const names = idArray.map(id => {
+        for (let i = 0; i < this.parts_options.length; i++) {
+          if (this.parts_options[i].id === Number(id)) {
+            // console.log('对应的数据',this.parts_options[i]);
+            return this.parts_options[i].name; 
+          }
+        }
+      });
+     let names_string = names.join(', ')  
+      return names_string
     },
     handleFilter() {
       this.listQuery.pageIndex = 1
@@ -382,7 +317,7 @@ export default {
           this.temp.componentIds = array
 
           createList(this.temp).then((res) => {
-            console.log('新增', res)
+            // console.log('新增', res)
             if (res.success) {
               this.dialogFormVisible = false
               this.getList()
@@ -425,13 +360,13 @@ export default {
           }
         }
         this.temp.componentIds = array
-        console.log(this.temp.componentIds)
+        // console.log(this.temp.componentIds)
 
         if (valid) {
           const tempData = Object.assign({}, this.temp)
           // tempData.timestamp = +new Date(tempData.timestamp); // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
           Update(tempData).then((res) => {
-            console.log('修改设备信息', res)
+            // console.log('修改设备信息', res)
             // this.getList();
             if (res.success) {
               this.dialogFormVisible = false
@@ -510,7 +445,7 @@ export default {
         })
       )
     },
-    getSortClass: function(key) {
+    getSortClass: function (key) {
       const sort = this.listQuery.sort
       return sort === `+${key}` ? 'ascending' : 'descending'
     }
@@ -521,6 +456,11 @@ export default {
 <style>
 /* 调整地址选择器高度 */
 .lin_management .el-input__inner {
-    height: 32px;
+  height: 32px;
+}
+
+.el-select {
+  width: 250px;
+  /* 或者你需要的任何宽度 */
 }
 </style>

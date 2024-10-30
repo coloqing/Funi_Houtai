@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 // 获取 设备管理
-export function getList(data) {
+export function getList_device(data) {
   return request({
     url: '/api/Device',
     method: 'get',

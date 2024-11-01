@@ -9,8 +9,7 @@
               :key="item.id"
               :label="item.name"
               :value="item.name"
-            >
-            </el-option>
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="列车号">
@@ -66,14 +65,14 @@
         label="ID"
         min-width="100"
         align="center"
-      ></el-table-column>
+      />
       <el-table-column prop="lineName" label="线路" width="180" align="center">
         <template slot-scope="scope">
           <el-input
             v-if="scope.row.editable"
             v-model="scope.row.lineName"
-            ></el-input>
-            <!-- @blur="handleBlur(scope.$index, 'lineName')" -->
+          />
+          <!-- @blur="handleBlur(scope.$index, 'lineName')" -->
           <span v-else>{{ scope.row.lineName }}</span>
         </template>
       </el-table-column>
@@ -87,8 +86,8 @@
           <el-input
             v-if="scope.row.editable"
             v-model="scope.row.trainNum"
-            ></el-input>
-            <!-- @blur="handleBlur(scope.$index, 'trainNum')" -->
+          />
+          <!-- @blur="handleBlur(scope.$index, 'trainNum')" -->
           <span v-else>{{ scope.row.trainNum }}</span>
         </template>
       </el-table-column>
@@ -102,8 +101,8 @@
           <el-input
             v-if="scope.row.editable"
             v-model="scope.row.name"
-            ></el-input>
-            <!-- @blur="handleBlur(scope.$index, 'name')" -->
+          />
+          <!-- @blur="handleBlur(scope.$index, 'name')" -->
           <span v-else>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
@@ -114,21 +113,18 @@
             size="small"
             type="danger"
             @click="cancelAllEdits(scope.$index, false)"
-            >取消修改</el-button
-          >
+          >取消修改</el-button>
           <el-button
             v-if="!isAllEditable"
             size="small"
             @click="toggleAllEdit(true)"
-            >修改所有</el-button
-          >
+          >修改所有</el-button>
           <el-button
             v-if="isAllEditable"
             size="small"
             type="primary"
             @click="toggleAllEdit(false)"
-            >修改完成</el-button
-          >
+          >修改完成</el-button>
           <el-button
             size="mini"
             type="danger"
@@ -143,8 +139,8 @@
     <pagination
       v-show="total > 0"
       :total="total"
-      :pageIndex.sync="listQuery.pageIndex"
-      :pageRow.sync="listQuery.pageRow"
+      :page.sync="listQuery.pageIndex"
+      :limit.sync="listQuery.pageRow"
       @pagination="getList"
     />
 
@@ -187,20 +183,20 @@ import {
   // fetchList,
   fetchPv,
   createArticle,
-  updateArticle,
-} from "@/api/article";
+  updateArticle
+} from '@/api/article'
 import {
   getList,
   createCoach,
   updateCoach,
   updateMuch,
-  deleteCoach,
-} from "@/api/basic_management/carriage-management";
-import { Lines } from "@/api/basic_management/line-management";
+  deleteCoach
+} from '@/api/basic_management/carriage-management'
+import { Lines } from '@/api/basic_management/line-management'
 
-import waves from "@/directive/waves"; // waves directive
-import { parseTime } from "@/utils";
-import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
+import waves from '@/directive/waves' // waves directive
+import { parseTime } from '@/utils'
+import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 // 地址选择器
 // import {
 //   provinceAndCityData,
@@ -209,36 +205,36 @@ import Pagination from "@/components/Pagination"; // secondary package based on 
 //   pcaTextArr,
 //   codeToText,
 // } from "element-china-area-data";
-import { pcTextArr } from "element-china-area-data";
+import { pcTextArr } from 'element-china-area-data'
 const calendarTypeOptions = [
-  { key: "CN", display_name: "China" },
-  { key: "US", display_name: "USA" },
-  { key: "JP", display_name: "Japan" },
-  { key: "EU", display_name: "Eurozone" },
-];
+  { key: 'CN', display_name: 'China' },
+  { key: 'US', display_name: 'USA' },
+  { key: 'JP', display_name: 'Japan' },
+  { key: 'EU', display_name: 'Eurozone' }
+]
 
 // arr to obj, such as { CN : "China", US : "USA" }
 const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name;
-  return acc;
-}, {});
+  acc[cur.key] = cur.display_name
+  return acc
+}, {})
 
 export default {
-  name: "ComplexTable",
+  name: 'ComplexTable',
   components: { Pagination },
   directives: { waves },
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: "success",
-        draft: "info",
-        deleted: "danger",
-      };
-      return statusMap[status];
+        published: 'success',
+        draft: 'info',
+        deleted: 'danger'
+      }
+      return statusMap[status]
     },
     typeFilter(type) {
-      return calendarTypeKeyValue[type];
-    },
+      return calendarTypeKeyValue[type]
+    }
   },
   data() {
     return {
@@ -249,25 +245,25 @@ export default {
       tableData: [
         {
           id: 1,
-          lineName: "线路1",
-          trainNum: "T101",
-          name: "01",
-          editable: false,
+          lineName: '线路1',
+          trainNum: 'T101',
+          name: '01',
+          editable: false
         },
         {
           id: 1,
-          lineName: "线路1",
-          trainNum: "T101",
-          name: "01",
-          editable: false,
+          lineName: '线路1',
+          trainNum: 'T101',
+          name: '01',
+          editable: false
         },
         {
           id: 1,
-          lineName: "线路1",
-          trainNum: "T101",
-          name: "01",
-          editable: false,
-        },
+          lineName: '线路1',
+          trainNum: 'T101',
+          name: '01',
+          editable: false
+        }
         // 其他数据项...
       ],
       // 所以线路
@@ -275,9 +271,9 @@ export default {
       isAllEditable: false,
       // 新增/修改 表单
       temps: {
-        lineName: "", // 线路
-        name: "", // 车厢号
-        trainNum: "", // 列车号
+        lineName: '', // 线路
+        name: '', // 车厢号
+        trainNum: '' // 列车号
       },
 
       // =================================================
@@ -287,8 +283,8 @@ export default {
       listLoading: true,
 
       form: {
-        xianlu: "",
-        liechehao: "",
+        xianlu: '',
+        liechehao: ''
       },
       // ----------------------------------------
 
@@ -296,269 +292,269 @@ export default {
         pageIndex: 1,
         pageRow: 10,
         lineName: undefined,
-        trainNum: undefined,
+        trainNum: undefined
       },
       importanceOptions: [1, 2, 3],
       calendarTypeOptions,
       sortOptions: [
-        { label: "ID Ascending", key: "+id" },
-        { label: "ID Descending", key: "-id" },
+        { label: 'ID Ascending', key: '+id' },
+        { label: 'ID Descending', key: '-id' }
       ],
-      statusOptions: ["published", "draft", "deleted"],
+      statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {
         id: undefined,
         importance: 1,
-        remark: "",
+        remark: '',
         timestamp: new Date(),
-        title: "",
-        type: "",
-        status: "published",
+        title: '',
+        type: '',
+        status: 'published'
       },
       dialogFormVisible: false,
-      dialogStatus: "",
+      dialogStatus: '',
       textMap: {
-        update: "Edit",
-        create: "Create",
+        update: 'Edit',
+        create: 'Create'
       },
       dialogPvVisible: false,
       pvData: [],
       rules: {
-        type: [{ required: true, message: "请输入省市", trigger: "change" }],
+        type: [{ required: true, message: '请输入省市', trigger: 'change' }],
         timestamp: [
           {
-            type: "date",
+            type: 'date',
             required: true,
-            message: "timestamp is required",
-            trigger: "change",
-          },
+            message: 'timestamp is required',
+            trigger: 'change'
+          }
         ],
-        title: [{ required: true, message: "请输入线路", trigger: "blur" }],
+        title: [{ required: true, message: '请输入线路', trigger: 'blur' }]
       },
-      downloadLoading: false,
-    };
+      downloadLoading: false
+    }
   },
   created() {
     // 获取表格数据
-    this.getList();
+    this.getList()
     // 获取所以线路
-    this.getLines();
+    this.getLines()
   },
   methods: {
     toggleAllEdit(state) {
-      this.isAllEditable = state;
+      this.isAllEditable = state
       this.tableData.forEach((row) => {
-        row.editable = state;
-      });
+        row.editable = state
+      })
       if (!state) {
         // 如果点击“修改完成”，则可以在这里执行其他逻辑，比如验证数据
         this.tableData.forEach((row) => {
-          delete row.editable;
-        });
+          delete row.editable
+        })
         // console.log(this.tableData);
         updateMuch(this.tableData).then((response) => {
-            // console.log('全部修改',response);
-            if (response.success) {
-              this.$message({
-                type: "success",
-                message: "修改成功!",
-              });
-            }else{
-              this.$message({
-                type: "info",
-                message: "修改失败!",
-              })
-            }
-        });
+          // console.log('全部修改',response);
+          if (response.success) {
+            this.$message({
+              type: 'success',
+              message: '修改成功!'
+            })
+          } else {
+            this.$message({
+              type: 'info',
+              message: '修改失败!'
+            })
+          }
+        })
       }
     },
     cancelAllEdits() {
       // 取消所有行的修改状态
       this.tableData.forEach((row) => {
-        row.editable = false;
-      });
-      this.isAllEditable = false; // 如果需要的话，也可以设置这个标志位为false
+        row.editable = false
+      })
+      this.isAllEditable = false // 如果需要的话，也可以设置这个标志位为false
     },
     // ==================================
     // 获取表格数据
     getList() {
-      this.listLoading = true;
+      this.listLoading = true
       getList(this.listQuery).then((response) => {
-        this.tableData = response.data;
-        this.total = response.total;
-        this.listLoading = false;
-      });
-      this.listLoading = false;
+        this.tableData = response.data
+        this.total = response.total
+        this.listLoading = false
+      })
+      this.listLoading = false
     },
     // 获取所有线路
     getLines() {
       Lines().then((response) => {
         // console.log("线路信息", response);
-        this.line_list = response.data;
-      });
+        this.line_list = response.data
+      })
     },
 
     handleFilter() {
-      this.listQuery.pageIndex = 1;
-      this.getList();
+      this.listQuery.pageIndex = 1
+      this.getList()
     },
     handleModifyStatus(row, status) {
       this.$message({
-        message: "操作成功",
-        type: "success",
-      });
-      row.status = status;
+        message: '操作成功',
+        type: 'success'
+      })
+      row.status = status
     },
     sortChange(data) {
-      const { prop, order } = data;
-      if (prop === "id") {
-        this.sortByID(order);
+      const { prop, order } = data
+      if (prop === 'id') {
+        this.sortByID(order)
       }
     },
     sortByID(order) {
-      if (order === "ascending") {
-        this.listQuery.sort = "+id";
+      if (order === 'ascending') {
+        this.listQuery.sort = '+id'
       } else {
-        this.listQuery.sort = "-id";
+        this.listQuery.sort = '-id'
       }
-      this.handleFilter();
+      this.handleFilter()
     },
     resetTemp() {
       this.temp = {
         id: undefined,
         importance: 1,
-        remark: "",
+        remark: '',
         timestamp: new Date(),
-        title: "",
-        status: "published",
-        type: "",
-      };
+        title: '',
+        status: 'published',
+        type: ''
+      }
     },
     handleCreate() {
-      this.resetTemp();
-      this.dialogStatus = "create";
-      this.dialogFormVisible = true;
+      this.resetTemp()
+      this.dialogStatus = 'create'
+      this.dialogFormVisible = true
       this.$nextTick(() => {
-        this.$refs["dataForm"].clearValidate();
-      });
+        this.$refs['dataForm'].clearValidate()
+      })
     },
     createData() {
-      this.$refs["dataForm"].validate((valid) => {
+      this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           // this.temp.id = parseInt(Math.random() * 100) + 1024; // mock a id
           // this.temp.author = "vue-element-admin";
           createCoach(this.temps).then((res) => {
             // console.log("进行新增", res);
-            this.getList();
+            this.getList()
 
             // this.list.unshift(this.temp);
-            this.dialogFormVisible = false;
+            this.dialogFormVisible = false
             this.$notify({
-              title: "成功",
-              message: "创建成功",
-              type: "success",
-              duration: 2000,
-            });
-          });
+              title: '成功',
+              message: '创建成功',
+              type: 'success',
+              duration: 2000
+            })
+          })
         }
-      });
+      })
     },
     handleUpdate(row) {
-      this.temp = Object.assign({}, row); // copy obj
-      this.temp.timestamp = new Date(this.temp.timestamp);
-      this.dialogStatus = "update";
-      this.dialogFormVisible = true;
+      this.temp = Object.assign({}, row) // copy obj
+      this.temp.timestamp = new Date(this.temp.timestamp)
+      this.dialogStatus = 'update'
+      this.dialogFormVisible = true
       this.$nextTick(() => {
-        this.$refs["dataForm"].clearValidate();
-      });
+        this.$refs['dataForm'].clearValidate()
+      })
     },
     updateData() {
-      this.$refs["dataForm"].validate((valid) => {
+      this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          const tempData = Object.assign({}, this.temp);
-          tempData.timestamp = +new Date(tempData.timestamp); // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
+          const tempData = Object.assign({}, this.temp)
+          tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
           updateArticle(tempData).then(() => {
-            const index = this.list.findIndex((v) => v.id === this.temp.id);
-            this.list.splice(index, 1, this.temp);
-            this.dialogFormVisible = false;
+            const index = this.list.findIndex((v) => v.id === this.temp.id)
+            this.list.splice(index, 1, this.temp)
+            this.dialogFormVisible = false
             this.$notify({
-              title: "成功",
-              message: "更新成功",
-              type: "success",
-              duration: 2000,
-            });
-          });
+              title: '成功',
+              message: '更新成功',
+              type: 'success',
+              duration: 2000
+            })
+          })
         }
-      });
+      })
     },
     handleDelete(row, index) {
       this.$confirm(
-        "此操作将永久删除id为 " + index + " 的线路, 是否继续?",
-        "提示",
+        '此操作将永久删除id为 ' + index + ' 的线路, 是否继续?',
+        '提示',
         {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning",
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
         }
       )
         .then(() => {
           // 确认删除的逻辑
           deleteCoach({ id: index }).then((res) => {
             if (res.success) {
-              this.getList();
+              this.getList()
               // 确认删除的逻辑
               this.$message({
-                type: "success",
-                message: "删除成功!",
-              });
+                type: 'success',
+                message: '删除成功!'
+              })
             } else {
               this.$message({
-                type: "info",
-                message: "删除失败",
-              });
+                type: 'info',
+                message: '删除失败'
+              })
             }
-          });
+          })
         })
         .catch(() => {
           // 取消删除的逻辑
           this.$message({
-            type: "info",
-            message: "已取消删除",
-          });
-        });
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
     },
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
-        this.pvData = response.data.pvData;
-        this.dialogPvVisible = true;
-      });
+        this.pvData = response.data.pvData
+        this.dialogPvVisible = true
+      })
     },
     handleDownload() {
       this.listQuery = {
         pageIndex: 1,
         pageRow: 10,
         lineName: undefined,
-        trainNum: undefined,
-      };
-      this.getList();
+        trainNum: undefined
+      }
+      this.getList()
     },
     formatJson(filterVal) {
       return this.list.map((v) =>
         filterVal.map((j) => {
-          if (j === "timestamp") {
-            return parseTime(v[j]);
+          if (j === 'timestamp') {
+            return parseTime(v[j])
           } else {
-            return v[j];
+            return v[j]
           }
         })
-      );
+      )
     },
-    getSortClass: function (key) {
-      const sort = this.listQuery.sort;
-      return sort === `+${key}` ? "ascending" : "descending";
-    },
-  },
-};
+    getSortClass: function(key) {
+      const sort = this.listQuery.sort
+      return sort === `+${key}` ? 'ascending' : 'descending'
+    }
+  }
+}
 </script>
 
 <style>

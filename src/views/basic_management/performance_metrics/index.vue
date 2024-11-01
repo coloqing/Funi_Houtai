@@ -102,8 +102,8 @@
     <pagination
       v-show="total > 0"
       :total="total"
-      :page-index.sync="listQuery.pageIndex"
-      :page-row.sync="listQuery.pageRow"
+      :page.sync="listQuery.pageIndex"
+      :limit.sync="listQuery.pageRow"
       @pagination="getList"
     />
 
@@ -351,8 +351,8 @@ export default {
     getLines() {
       fetchList_Signal().then((response) => {
         // console.log("信号量", response);
-        this.parts_options = response.data;
-      });
+        this.parts_options = response.data
+      })
     },
     handleFilter() {
       this.listQuery.pageIndex = 1

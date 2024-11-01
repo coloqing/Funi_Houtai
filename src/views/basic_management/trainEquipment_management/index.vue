@@ -8,21 +8,42 @@
           </el-select>
         </el-form-item> -->
         <el-form-item label="列车号">
-          <el-input v-model="listQuery.trainNum" placeholder="请输入列车号" style="width: 200px; margin-right: 10px"
-            class="filter-item" @keyup.enter.native="handleFilter" />
+          <el-input
+            v-model="listQuery.trainNum"
+            placeholder="请输入列车号"
+            style="width: 200px; margin-right: 10px"
+            class="filter-item"
+            @keyup.enter.native="handleFilter"
+          />
         </el-form-item>
         <el-form-item label="关联设备编码">
-          <el-input v-model="listQuery.deviceSN" placeholder="请输入关联设备编码" style="width: 200px; margin-right: 10px"
-            class="filter-item" @keyup.enter.native="handleFilter" />
+          <el-input
+            v-model="listQuery.deviceSN"
+            placeholder="请输入关联设备编码"
+            style="width: 200px; margin-right: 10px"
+            class="filter-item"
+            @keyup.enter.native="handleFilter"
+          />
         </el-form-item>
         <!-- 功能按钮 -->
         <el-form-item>
-          <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-refresh"
-            @click="handleDownload">
+          <el-button
+            v-waves
+            :loading="downloadLoading"
+            class="filter-item"
+            type="primary"
+            icon="el-icon-refresh"
+            @click="handleDownload"
+          >
             重置
           </el-button>
-          <el-button class="filter-item" style="margin-left: 10px" type="primary" icon="el-icon-edit"
-            @click="handleCreate">
+          <el-button
+            class="filter-item"
+            style="margin-left: 10px"
+            type="primary"
+            icon="el-icon-edit"
+            @click="handleCreate"
+          >
             新增
           </el-button>
           <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
@@ -32,11 +53,24 @@
       </el-form>
     </div>
 
-    <el-table :key="tableKey" v-loading="listLoading" :data="parts_list" border
-      :header-cell-style="{ backgroundColor: 'rgb(244, 243, 249)' }" fit highlight-current-row style="width: 100%"
-      @sort-change="sortChange">
-      <el-table-column label="序号" prop="id" align="center" min-width="80"
-        :class-name="getSortClass('id')">
+    <el-table
+      :key="tableKey"
+      v-loading="listLoading"
+      :data="parts_list"
+      border
+      :header-cell-style="{ backgroundColor: 'rgb(244, 243, 249)' }"
+      fit
+      highlight-current-row
+      style="width: 100%"
+      @sort-change="sortChange"
+    >
+      <el-table-column
+        label="序号"
+        prop="id"
+        align="center"
+        min-width="80"
+        :class-name="getSortClass('id')"
+      >
         <template slot-scope="{ row }">
           <span>{{ row.id }}</span>
         </template>
@@ -77,12 +111,23 @@
         </template>
       </el-table-column>
     </el-table>
-    <pagination v-show="total > 0" :total="total" :page-index.sync="listQuery.pageIndex"
-      :page-row.sync="listQuery.pageRow" @pagination="getList" />
+    <pagination
+      v-show="total > 0"
+      :total="total"
+      :page.sync="listQuery.pageIndex"
+      :limit.sync="listQuery.pageRow"
+      @pagination="getList"
+    />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temps" label-position="left" label-width="70px"
-        style="width: 400px; margin-left: 50px">
+      <el-form
+        ref="dataForm"
+        :rules="rules"
+        :model="temps"
+        label-position="left"
+        label-width="70px"
+        style="width: 400px; margin-left: 50px"
+      >
         <el-form-item label="列车id" prop="coachType" label-width="100px">
           <!-- <el-input v-model="temp.trainId" placeholder="请输入设备编码" /> -->
           <el-select v-model="temp.trainId" placeholder="请选择列车id" @change="train_id">
@@ -141,13 +186,11 @@ import {
   // updateArticle,
 } from '@/api/article'
 // 列车设备管理
-import { getList, createList, Update, Delete, relevancyDeviceSignal } from '@/api/basic_management/trainEquipment_management'
+import { getList, createList, Update, Delete } from '@/api/basic_management/trainEquipment_management'
 
 // import { Lines } from '@/api/basic_management/line-management'
-import { getTrain } from "@/api/basic_management/train-management";
+import { getTrain } from '@/api/basic_management/train-management'
 import { getList_device } from '@/api/basic_management/equipment_management'
-
-
 
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
@@ -205,9 +248,9 @@ export default {
         }
       ],
       // 设备信息
-      equipment_list:[],
+      equipment_list: [],
       // 列车信息
-      train_list:[],
+      train_list: [],
       total: 0,
       listLoading: true,
       // 列车线路
@@ -250,7 +293,7 @@ export default {
       // ],
       listQuery: {
         pageIndex: 1,
-        pageRow: 10,
+        pageRow: 10
       },
       importanceOptions: [1, 2, 3],
       calendarTypeOptions,
@@ -265,7 +308,7 @@ export default {
         trainNum: null,
         coachType: null,
         deviceId: null,
-        deviceSN: null,
+        deviceSN: null
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -312,35 +355,32 @@ export default {
         // console.log('列车信息', response)
         this.train_list = response.data
       })
-      // 设备查询  
+      // 设备查询
       getList_device().then((response) => {
         // console.log('设备信息', response)
         this.equipment_list = response.data
       })
-
     },
     // 选择列车id
-    train_id(value){
-      const selectedItem = this.train_list.find(item => item.id === value);  
+    train_id(value) {
+      const selectedItem = this.train_list.find(item => item.id === value)
       this.temp.trainNum = selectedItem.name
     },
     // 选择列车号
-    train_name(value){
-      const selectedItem = this.train_list.find(item => item.name === value);  
+    train_name(value) {
+      const selectedItem = this.train_list.find(item => item.name === value)
       this.temp.trainId = selectedItem.id
     },
     // 选择设备
-    equipment_id(value){
-      const selectedItem = this.equipment_list.find(item => item.id === value);  
+    equipment_id(value) {
+      const selectedItem = this.equipment_list.find(item => item.id === value)
       this.temp.deviceSN = selectedItem.sn
     },
     // 选择设备
-    equipment_sn(value){
-      const selectedItem = this.equipment_list.find(item => item.sn === value);  
+    equipment_sn(value) {
+      const selectedItem = this.equipment_list.find(item => item.sn === value)
       this.temp.deviceId = selectedItem.id
     },
-
-
 
     handleFilter() {
       this.listQuery.pageIndex = 1
@@ -373,7 +413,7 @@ export default {
         trainNum: null,
         coachType: null,
         deviceId: null,
-        deviceSN: null,
+        deviceSN: null
       }
     },
     handleCreate() {
@@ -501,7 +541,7 @@ export default {
         })
       )
     },
-    getSortClass: function (key) {
+    getSortClass: function(key) {
       const sort = this.listQuery.sort
       return sort === `+${key}` ? 'ascending' : 'descending'
     }

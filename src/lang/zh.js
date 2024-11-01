@@ -2,23 +2,23 @@ export default {
   route: {
     // 自定义翻译
     // -------基础管理---------
-    basicManagement:'基础管理',
-    lineManagement:'线路管理',
-    trainManagement:'列车管理',
-    carriageManagement:'车厢管理',
-    equipmentManagement:'设备管理',
-    partsManagement:'部件管理',
-    performanceMetrics:'性能指标',
-    semaphore:'信号量',
-    lineEquipmentManagement:'列车设备管理',
+    basicManagement: '基础管理',
+    lineManagement: '线路管理',
+    trainManagement: '列车管理',
+    carriageManagement: '车厢管理',
+    equipmentManagement: '设备管理',
+    partsManagement: '部件管理',
+    performanceMetrics: '性能指标',
+    semaphore: '信号量',
+    lineEquipmentManagement: '列车设备管理',
     // -------系统管理---------
-    systemManagement:'系统管理',
-    menuManagement:'菜单管理',
-    roleManagement:'角色管理',
-    organizationManagement:'组织结构管理',
-    configurationManagement:'系统配置管理',
+    systemManagement: '系统管理',
+    menuManagement: '菜单管理',
+    roleManagement: '角色管理',
+    organizationManagement: '组织结构管理',
+    configurationManagement: '系统配置管理',
     // -------用户管理---------
-    userManagement:'用户管理',
+    userManagement: '用户管理',
     // ----------------
     dashboard: '首页',
     documentation: '文档',

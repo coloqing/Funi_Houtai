@@ -11,15 +11,14 @@
             @keyup.enter.native="handleFilter"
           /> -->
           <!-- <el-form-item label="线路"> -->
-            <el-select v-model="listQuery.lineId" placeholder="请选择线路">
-              <el-option
-                v-for="item in line_list"
-                :key="item.id"
-                :label="item.name"
-                :value="item.lineId"
-              >
-              </el-option>
-            </el-select>
+          <el-select v-model="listQuery.lineId" placeholder="请选择线路">
+            <el-option
+              v-for="item in line_list"
+              :key="item.id"
+              :label="item.name"
+              :value="item.lineId"
+            />
+          </el-select>
           <!-- </el-form-item> -->
         </el-form-item>
         <el-form-item label="省-市">
@@ -213,47 +212,47 @@ import {
   fetchList,
   fetchPv,
   createArticle,
-  updateArticle,
-} from "@/api/article";
+  updateArticle
+} from '@/api/article'
 import {
   Lines,
   addLines,
-  updateLines,
-} from "@/api/basic_management/line-management";
-import waves from "@/directive/waves"; // waves directive
-import { parseTime } from "@/utils";
-import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
+  updateLines
+} from '@/api/basic_management/line-management'
+import waves from '@/directive/waves' // waves directive
+import { parseTime } from '@/utils'
+import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 // 地址选择器
-import { pcTextArr } from "element-china-area-data";
+import { pcTextArr } from 'element-china-area-data'
 const calendarTypeOptions = [
-  { key: "CN", display_name: "China" },
-  { key: "US", display_name: "USA" },
-  { key: "JP", display_name: "Japan" },
-  { key: "EU", display_name: "Eurozone" },
-];
+  { key: 'CN', display_name: 'China' },
+  { key: 'US', display_name: 'USA' },
+  { key: 'JP', display_name: 'Japan' },
+  { key: 'EU', display_name: 'Eurozone' }
+]
 
 // arr to obj, such as { CN : "China", US : "USA" }
 const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name;
-  return acc;
-}, {});
+  acc[cur.key] = cur.display_name
+  return acc
+}, {})
 
 export default {
-  name: "ComplexTable",
+  name: 'ComplexTable',
   components: { Pagination },
   directives: { waves },
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: "success",
-        draft: "info",
-        deleted: "danger",
-      };
-      return statusMap[status];
+        published: 'success',
+        draft: 'info',
+        deleted: 'danger'
+      }
+      return statusMap[status]
     },
     typeFilter(type) {
-      return calendarTypeKeyValue[type];
-    },
+      return calendarTypeKeyValue[type]
+    }
   },
   data() {
     return {
@@ -261,17 +260,17 @@ export default {
       pcTextArr,
       selectedOptions: [],
       tableKey: 0,
-      line_list:null,
+      line_list: null,
       total: 0,
       listLoading: true,
       // 新增/修改 对应表单
       temps: {
-        id: "",
-        province: "",
-        city: "",
-        name: "",
-        grouping: "",
-        devicePerCarriage: "",
+        id: '',
+        province: '',
+        city: '',
+        name: '',
+        grouping: '',
+        devicePerCarriage: ''
       },
 
       // -------------------------
@@ -283,7 +282,7 @@ export default {
         // 市
         city: undefined,
         pageIndex: 1,
-        pageRow: 10,
+        pageRow: 10
         // importance: undefined,
         // type: undefined,
         // sort: "+id",
@@ -291,49 +290,49 @@ export default {
       importanceOptions: [1, 2, 3],
       calendarTypeOptions,
       sortOptions: [
-        { label: "ID Ascending", key: "+id" },
-        { label: "ID Descending", key: "-id" },
+        { label: 'ID Ascending', key: '+id' },
+        { label: 'ID Descending', key: '-id' }
       ],
-      statusOptions: ["published", "draft", "deleted"],
+      statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {
         id: undefined,
         importance: 1,
-        remark: "",
+        remark: '',
         timestamp: new Date(),
-        title: "",
-        type: "",
-        status: "published",
+        title: '',
+        type: '',
+        status: 'published'
       },
       dialogFormVisible: false,
-      dialogStatus: "",
+      dialogStatus: '',
       textMap: {
-        update: "Edit",
-        create: "Create",
+        update: 'Edit',
+        create: 'Create'
       },
       dialogPvVisible: false,
       pvData: [],
       rules: {
-        type: [{ required: true, message: "请输入省市", trigger: "change" }],
+        type: [{ required: true, message: '请输入省市', trigger: 'change' }],
         timestamp: [
           {
-            type: "date",
+            type: 'date',
             required: true,
-            message: "timestamp is required",
-            trigger: "change",
-          },
+            message: 'timestamp is required',
+            trigger: 'change'
+          }
         ],
-        title: [{ required: true, message: "请输入线路", trigger: "blur" }],
+        title: [{ required: true, message: '请输入线路', trigger: 'blur' }]
       },
-      downloadLoading: false,
-    };
+      downloadLoading: false
+    }
   },
   created() {
-    this.getList();
+    this.getList()
   },
   methods: {
     getList(form) {
-      this.listLoading = true;
+      this.listLoading = true
       // if (form) {
       //   Lines(this.listQuery).then((response) => {
       //     console.log("线路管理list", response);
@@ -344,23 +343,23 @@ export default {
       // } else {
       Lines(this.listQuery).then((response) => {
         // console.log("线路管理list", response);
-        this.line_list = response.data;
-        this.total = response.total;
-        this.listLoading = false;
-      });
+        this.line_list = response.data
+        this.total = response.total
+        this.listLoading = false
+      })
       // }
     },
     // 清除temps
     clear_temps() {
       this.temps = {
-        id: "",
-        province: "",
-        city: "",
-        name: "",
-        grouping: "",
-        devicePerCarriage: "",
-      };
-      this.selectedOptions = [];
+        id: '',
+        province: '',
+        city: '',
+        name: '',
+        grouping: '',
+        devicePerCarriage: ''
+      }
+      this.selectedOptions = []
     },
     clear_listQuery() {
       this.listQuery = {
@@ -371,168 +370,168 @@ export default {
         // 市
         city: undefined,
         pageIndex: 1,
-        pageRow: 10,
-      };
+        pageRow: 10
+      }
     },
     handleFilter() {
       //  selectedOptions   listQuery
       // 省 province   市 city
-      this.listQuery.pageIndex = 1;
-      this.listQuery.province = this.selectedOptions[0];
-      this.listQuery.city = this.selectedOptions[1];
+      this.listQuery.pageIndex = 1
+      this.listQuery.province = this.selectedOptions[0]
+      this.listQuery.city = this.selectedOptions[1]
 
-      this.getList(this.listQuery);
+      this.getList(this.listQuery)
     },
     handleModifyStatus(row, status) {
       this.$message({
-        message: "操作成功",
-        type: "success",
-      });
-      row.status = status;
+        message: '操作成功',
+        type: 'success'
+      })
+      row.status = status
     },
     sortChange(data) {
-      const { prop, order } = data;
-      if (prop === "id") {
-        this.sortByID(order);
+      const { prop, order } = data
+      if (prop === 'id') {
+        this.sortByID(order)
       }
     },
     sortByID(order) {
-      if (order === "ascending") {
-        this.listQuery.sort = "+id";
+      if (order === 'ascending') {
+        this.listQuery.sort = '+id'
       } else {
-        this.listQuery.sort = "-id";
+        this.listQuery.sort = '-id'
       }
-      this.handleFilter();
+      this.handleFilter()
     },
     resetTemp() {
       this.temp = {
         id: undefined,
         importance: 1,
-        remark: "",
+        remark: '',
         timestamp: new Date(),
-        title: "",
-        status: "published",
-        type: "",
-      };
+        title: '',
+        status: 'published',
+        type: ''
+      }
     },
     handleCreate() {
       // 清除temps
-      this.clear_temps();
-      this.dialogStatus = "create";
-      this.dialogFormVisible = true;
+      this.clear_temps()
+      this.dialogStatus = 'create'
+      this.dialogFormVisible = true
       this.$nextTick(() => {
-        this.$refs["dataForm"].clearValidate();
-      });
+        this.$refs['dataForm'].clearValidate()
+      })
     },
     // 取消新增 或者 取消修改
     cancel_adjust() {
-      this.clear_temps();
-      this.dialogFormVisible = false;
+      this.clear_temps()
+      this.dialogFormVisible = false
     },
 
     // 新增线路
     createData() {
-      this.$refs["dataForm"].validate((valid) => {
+      this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           addLines(this.temps).then((res) => {
             // console.log("新增线路", res);
-            this.getList();
-            this.dialogFormVisible = false;
+            this.getList()
+            this.dialogFormVisible = false
             this.$notify({
-              title: "成功",
-              message: "创建成功",
-              type: "success",
-              duration: 2000,
-            });
-          });
+              title: '成功',
+              message: '创建成功',
+              type: 'success',
+              duration: 2000
+            })
+          })
         }
-      });
+      })
     },
     handleUpdate(row) {
-      this.temps = Object.assign({}, row); // copy obj
-      let tmp = this.temps.province;
-      this.temps.province = [tmp, this.temps.city];
+      this.temps = Object.assign({}, row) // copy obj
+      const tmp = this.temps.province
+      this.temps.province = [tmp, this.temps.city]
       // this.temp.timestamp = new Date(this.temp.timestamp);
       // console.log("操作的对象", this.temp);
-      this.dialogStatus = "update";
-      this.dialogFormVisible = true;
+      this.dialogStatus = 'update'
+      this.dialogFormVisible = true
       this.$nextTick(() => {
-        this.$refs["dataForm"].clearValidate();
-      });
+        this.$refs['dataForm'].clearValidate()
+      })
     },
     // 修改线路
     updateData() {
-      this.$refs["dataForm"].validate((valid) => {
+      this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          const tempData = Object.assign({}, this.temps);
+          const tempData = Object.assign({}, this.temps)
           // tempData.timestamp = +new Date(tempData.timestamp); // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
           updateLines(tempData).then(() => {
             // const index = this.list.findIndex((v) => v.id === this.temp.id);
             // this.list.splice(index, 1, this.temp);
-            this.listQuery.province = this.selectedOptions[0];
-            this.listQuery.city = this.selectedOptions[1];
-            this.getList(this.listQuery);
-            this.dialogFormVisible = false;
+            this.listQuery.province = this.selectedOptions[0]
+            this.listQuery.city = this.selectedOptions[1]
+            this.getList(this.listQuery)
+            this.dialogFormVisible = false
             this.$notify({
-              title: "成功",
-              message: "更新成功",
-              type: "success",
-              duration: 2000,
-            });
-          });
+              title: '成功',
+              message: '更新成功',
+              type: 'success',
+              duration: 2000
+            })
+          })
         }
-      });
+      })
     },
     handleDelete(row, index) {
-      this.$confirm("此操作将永久删除id为 "+ index +" 的线路, 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
+      this.$confirm('此操作将永久删除id为 ' + index + ' 的线路, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
       })
         .then(() => {
           // 确认删除的逻辑
           this.$message({
-            type: "success",
-            message: "删除成功!",
-          });
+            type: 'success',
+            message: '删除成功!'
+          })
         })
         .catch(() => {
           // 取消删除的逻辑
           this.$message({
-            type: "info",
-            message: "已取消删除",
-          });
-        });
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
     },
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
-        this.pvData = response.data.pvData;
-        this.dialogPvVisible = true;
-      });
+        this.pvData = response.data.pvData
+        this.dialogPvVisible = true
+      })
     },
     // 重置
     handleDownload() {
-      this.clear_temps(); //多余
-      this.clear_listQuery();
-      this.getList();
+      this.clear_temps() // 多余
+      this.clear_listQuery()
+      this.getList()
     },
     formatJson(filterVal) {
       return this.list.map((v) =>
         filterVal.map((j) => {
-          if (j === "timestamp") {
-            return parseTime(v[j]);
+          if (j === 'timestamp') {
+            return parseTime(v[j])
           } else {
-            return v[j];
+            return v[j]
           }
         })
-      );
+      )
     },
-    getSortClass: function (key) {
-      const sort = this.listQuery.sort;
-      return sort === `+${key}` ? "ascending" : "descending";
-    },
-  },
-};
+    getSortClass: function(key) {
+      const sort = this.listQuery.sort
+      return sort === `+${key}` ? 'ascending' : 'descending'
+    }
+  }
+}
 </script>
 
 <style>

@@ -118,129 +118,141 @@ import nestedRouter from './modules/nested'
  * all roles can be accessed
  */
 export const constantRoutes = [
+  
+    {
+      path: "/icon",
+      component: Layout,
+      children: [
+        {
+          path: "index",
+          component: () => import("@/views/icons/index"),
+          name: "Icons",
+          meta: { title: "icons", icon: "icon", noCache: true },
+        },
+      ],
+    },
   /** 自定义路由===================**/
-  {
-    path: '/basic_management',
-    component: Layout,
-    redirect: '/line-management',
-    alwaysShow: true,
-    meta: { title: 'basicManagement', icon: 'el-icon-menu' },
-    children: [
-      {
-        path: 'line',
-        component: () =>
-          import('@/views/basic_management/line-management/index'),
-        name: 'line',
-        meta: { title: 'lineManagement', roles: ['editor'] }
-      },
-      {
-        path: 'train',
-        component: () =>
-          import('@/views/basic_management/train-management/index'),
-        name: 'train-management',
-        meta: { title: 'trainManagement', roles: ['admin', 'editor'] }
-      },
-      {
-        path: 'carriage',
-        component: () =>
-          import('@/views/basic_management/carriage-management/index'),
-        name: 'carriage-management',
-        meta: { title: 'carriageManagement', roles: ['admin', 'editor'] }
-      },
-      {
-        path: 'equipment',
-        component: () =>
-          import('@/views/basic_management/equipment_management/index'),
-        name: 'equipment_management',
-        meta: { title: 'equipmentManagement', roles: ['admin', 'editor'] }
-      },
-      {
-        path: 'parts',
-        component: () =>
-          import('@/views/basic_management/parts-management/index'),
-        name: 'parts-management',
-        meta: { title: 'partsManagement', roles: ['admin', 'editor'] }
-      },
-      {
-        path: 'performance',
-        component: () =>
-          import('@/views/basic_management/performance_metrics/index'),
-        name: 'performance_metrics',
-        meta: { title: 'performanceMetrics', roles: ['admin', 'editor'] }
-      },
-      {
-        path: 'semaphore',
-        component: () =>
-          import('@/views/basic_management/semaphore/index'),
-        name: 'semaphore',
-        meta: { title: 'semaphore', roles: ['admin', 'editor'] }
-      },
-      {
-        path: 'trainEquipment',
-        component: () =>
-          import('@/views/basic_management/trainEquipment_management/index'),
-        name: 'trainEquipment_management',
-        meta: { title: 'lineEquipmentManagement', roles: ['admin', 'editor'] }
-      }
-
-    ]
-  },
-  {
-    path: '/system_administration',
-    component: Layout,
-    redirect: '/menu-management',
-    alwaysShow: true,
-    meta: { title: 'systemManagement', icon: 'el-icon-s-tools' },
-    children: [
-      {
-        path: 'munu',
-        component: () =>
-          import('@/views/system_administration/menu_management/index'),
-        name: 'menu_management',
-        meta: { title: 'menuManagement', roles: ['admin', 'editor'] }
-      },
-      {
-        path: 'role',
-        component: () =>
-          import('@/views/system_administration/role_management/index'),
-        name: 'role_management',
-        meta: { title: 'roleManagement', roles: ['admin', 'editor'] }
-      },
-      {
-        path: 'organizational',
-        component: () =>
-          import(
-            '@/views/system_administration/organizational_management/index'
-          ),
-        name: 'organizational_management',
-        meta: { title: 'organizationManagement', roles: ['admin', 'editor'] }
-      },
-      {
-        path: 'configuration',
-        component: () =>
-          import(
-            '@/views/system_administration/configuration_management/index'
-          ),
-        name: 'configuration_management',
-        meta: { title: 'configurationManagement', roles: ['admin', 'editor'] }
-      }
-    ]
-  },
-  {
-    path: '/user_management',
-    component: Layout,
-    redirect: '/user_management',
-    alwaysShow: true,
-    meta: { title: 'userManagement', icon: 'el-icon-user-solid' },
-    children: [
-      {
-        path: 'user',
-        component: () => import('@/views/user_management/index'),
-        name: 'user_management',
-        meta: { title: 'userManagement', roles: ['admin', 'editor'] }
-      }
-    ]
-  },
+  // {
+  //   path: '/basic_management',
+  //   component: Layout,
+  //   redirect: '/line-management',
+  //   alwaysShow: true,
+  //   meta: { title: 'basicManagement', icon: 'el-icon-menu' },
+  //   children: [
+  //     {
+  //       path: 'line',
+  //       component: () =>
+  //         import('@/views/basic_management/line-management/index'),
+  //       name: 'line',
+  //       meta: { title: 'lineManagement', roles: ['editor'] }
+  //     },
+  //     {
+  //       path: 'train',
+  //       component: () =>
+  //         import('@/views/basic_management/train-management/index'),
+  //       name: 'train-management',
+  //       meta: { title: 'trainManagement', roles: ['admin', 'editor'] }
+  //     },
+  //     {
+  //       path: 'carriage',
+  //       component: () =>
+  //         import('@/views/basic_management/carriage-management/index'),
+  //       name: 'carriage-management',
+  //       meta: { title: 'carriageManagement', roles: ['admin', 'editor'] }
+  //     },
+  //     {
+  //       path: 'equipment',
+  //       component: () =>
+  //         import('@/views/basic_management/equipment_management/index'),
+  //       name: 'equipment_management',
+  //       meta: { title: 'equipmentManagement', roles: ['admin', 'editor'] }
+  //     },
+  //     {
+  //       path: 'parts',
+  //       component: () =>
+  //         import('@/views/basic_management/parts-management/index'),
+  //       name: 'parts-management',
+  //       meta: { title: 'partsManagement', roles: ['admin', 'editor'] }
+  //     },
+  //     {
+  //       path: 'performance',
+  //       component: () =>
+  //         import('@/views/basic_management/performance_metrics/index'),
+  //       name: 'performance_metrics',
+  //       meta: { title: 'performanceMetrics', roles: ['admin', 'editor'] }
+  //     },
+  //     {
+  //       path: 'semaphore',
+  //       component: () =>
+  //         import('@/views/basic_management/semaphore/index'),
+  //       name: 'semaphore',
+  //       meta: { title: 'semaphore', roles: ['admin', 'editor'] }
+  //     },
+  //     {
+  //       path: 'trainEquipment',
+  //       component: () =>
+  //         import('@/views/basic_management/trainEquipment_management/index'),
+  //       name: 'trainEquipment_management',
+  //       meta: { title: 'lineEquipmentManagement', roles: ['admin', 'editor'] }
+  //     }
+  //   ]
+  // },
+  // {
+  //   path: '/system_administration',
+  //   component: Layout,
+  //   redirect: '/menu-management',
+  //   alwaysShow: true,
+  //   meta: { title: 'systemManagement', icon: 'el-icon-s-tools' },
+  //   children: [
+  //     {
+  //       path: 'munu',
+  //       component: () =>
+  //         import('@/views/system_administration/menu_management/index'),
+  //       name: 'menu_management',
+  //       meta: { title: 'menuManagement', roles: ['admin', 'editor'] }
+  //     },
+  //     {
+  //       path: 'role',
+  //       component: () =>
+  //         import('@/views/system_administration/role_management/index'),
+  //       name: 'role_management',
+  //       meta: { title: 'roleManagement', roles: ['admin', 'editor'] }
+  //     },
+  //     {
+  //       path: 'organizational',
+  //       component: () =>
+  //         import(
+  //           '@/views/system_administration/organizational_management/index'
+  //         ),
+  //       name: 'organizational_management',
+  //       meta: { title: 'organizationManagement', roles: ['admin', 'editor'] }
+  //     },
+  //     {
+  //       path: 'configuration',
+  //       component: () =>
+  //         import(
+  //           '@/views/system_administration/configuration_management/index'
+  //         ),
+  //       name: 'configuration_management',
+  //       meta: { title: 'configurationManagement', roles: ['admin', 'editor'] }
+  //     }
+  //   ]
+  // },
+  // {
+  //   path: '/user_management',
+  //   component: Layout,
+  //   redirect: '/user_management',
+  //   alwaysShow: true,
+  //   meta: { title: 'userManagement', icon: 'el-icon-user-solid' },
+  //   children: [
+  //     {
+  //       path: 'user',
+  //       component: () => import('@/views/user_management/index'),
+  //       name: 'user_management',
+  //       meta: { title: 'userManagement', roles: ['admin', 'editor'] }
+  //     }
+  //   ]
+  // },
   /** 自定义路由=========over==========**/
   {
     path: '/login',
@@ -265,9 +277,10 @@ export const constantRoutes = [
   {
     path: '/',
     component: Layout,
-    redirect: '/basic_management/line'
+    // redirect: '/basic_management/line'
+    redirect: '/icon/index'
   },
-  { path: '*', redirect: '/404', hidden: true }
+  // { path: '*', redirect: '/404', hidden: true }
 
   // {
   //   path: "/redirect",

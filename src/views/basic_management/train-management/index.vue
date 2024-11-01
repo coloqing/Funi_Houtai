@@ -18,8 +18,7 @@
               :key="item.id"
               :label="item.name"
               :value="item.lineId"
-            >
-            </el-option>
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="列车号">
@@ -159,8 +158,7 @@
               :key="item.id"
               :label="item.name"
               :value="item.lineId"
-            >
-            </el-option>
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="列车号" label-width="100px">
@@ -205,50 +203,50 @@ import {
   fetchList,
   fetchPv,
   createArticle,
-  updateArticle,
-} from "@/api/article";
+  updateArticle
+} from '@/api/article'
 
 import {
   getTrain,
   createTrain,
-  Update,
-} from "@/api/basic_management/train-management";
+  Update
+} from '@/api/basic_management/train-management'
 
-import { Lines } from "@/api/basic_management/line-management";
-import waves from "@/directive/waves"; // waves directive
-import { parseTime } from "@/utils";
-import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
-import { pcTextArr } from "element-china-area-data";
+import { Lines } from '@/api/basic_management/line-management'
+import waves from '@/directive/waves' // waves directive
+import { parseTime } from '@/utils'
+import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import { pcTextArr } from 'element-china-area-data'
 
 const calendarTypeOptions = [
-  { key: "CN", display_name: "China" },
-  { key: "US", display_name: "USA" },
-  { key: "JP", display_name: "Japan" },
-  { key: "EU", display_name: "Eurozone" },
-];
+  { key: 'CN', display_name: 'China' },
+  { key: 'US', display_name: 'USA' },
+  { key: 'JP', display_name: 'Japan' },
+  { key: 'EU', display_name: 'Eurozone' }
+]
 
 // arr to obj, such as { CN : "China", US : "USA" }
 const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name;
-  return acc;
-}, {});
+  acc[cur.key] = cur.display_name
+  return acc
+}, {})
 
 export default {
-  name: "ComplexTable",
+  name: 'ComplexTable',
   components: { Pagination },
   directives: { waves },
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: "success",
-        draft: "info",
-        deleted: "danger",
-      };
-      return statusMap[status];
+        published: 'success',
+        draft: 'info',
+        deleted: 'danger'
+      }
+      return statusMap[status]
     },
     typeFilter(type) {
-      return calendarTypeKeyValue[type];
-    },
+      return calendarTypeKeyValue[type]
+    }
   },
   data() {
     return {
@@ -263,13 +261,13 @@ export default {
       listLoading: true,
       // 查询的表单
       form: {
-        lineId: "",
-        name: "",
+        lineId: '',
+        name: ''
       },
       // 新增/修改 表单
       temps: {
-        lineId: "",
-        name: "",
+        lineId: '',
+        name: ''
       },
 
       // =============================
@@ -278,7 +276,7 @@ export default {
         pageIndex: 1,
         pageRow: 10,
         lineId: undefined,
-        name: undefined,
+        name: undefined
         // importance: undefined,
         // title: "",
         // type: undefined,
@@ -287,75 +285,75 @@ export default {
       importanceOptions: [1, 2, 3],
       calendarTypeOptions,
       sortOptions: [
-        { label: "ID Ascending", key: "+id" },
-        { label: "ID Descending", key: "-id" },
+        { label: 'ID Ascending', key: '+id' },
+        { label: 'ID Descending', key: '-id' }
       ],
-      statusOptions: ["published", "draft", "deleted"],
+      statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {
         id: undefined,
         importance: 1,
-        remark: "",
+        remark: '',
         timestamp: new Date(),
-        title: "",
-        type: "",
-        status: "published",
+        title: '',
+        type: '',
+        status: 'published'
       },
       dialogFormVisible: false,
-      dialogStatus: "",
+      dialogStatus: '',
       textMap: {
-        update: "Edit",
-        create: "Create",
+        update: 'Edit',
+        create: 'Create'
       },
       dialogPvVisible: false,
       pvData: [],
       rules: {
-        type: [{ required: true, message: "请输入省市", trigger: "change" }],
+        type: [{ required: true, message: '请输入省市', trigger: 'change' }],
         timestamp: [
           {
-            type: "date",
+            type: 'date',
             required: true,
-            message: "timestamp is required",
-            trigger: "change",
-          },
+            message: 'timestamp is required',
+            trigger: 'change'
+          }
         ],
-        title: [{ required: true, message: "请输入线路", trigger: "blur" }],
+        title: [{ required: true, message: '请输入线路', trigger: 'blur' }]
       },
-      downloadLoading: false,
-    };
+      downloadLoading: false
+    }
   },
   created() {
-    this.getList();
-    this.getLines();
+    this.getList()
+    this.getLines()
   },
   methods: {
     getList() {
-      this.listLoading = true;
+      this.listLoading = true
       getTrain(this.listQuery).then((response) => {
-        this.train_list = response.data;
-        this.total = response.total;
-        this.listLoading = false;
-      });
-      this.listLoading = false;
+        this.train_list = response.data
+        this.total = response.total
+        this.listLoading = false
+      })
+      this.listLoading = false
     },
     // 获取所有线路
     getLines() {
       Lines().then((response) => {
         // console.log("线路信息", response);
-        this.line_list = response.data;
-      });
+        this.line_list = response.data
+      })
     },
     handleFilter() {
-      this.listQuery.pageIndex = 1;
-      this.getList();
+      this.listQuery.pageIndex = 1
+      this.getList()
       // console.log("我要进行查询");
     },
     handleModifyStatus(row, status) {
       this.$message({
-        message: "操作成功",
-        type: "success",
-      });
-      row.status = status;
+        message: '操作成功',
+        type: 'success'
+      })
+      row.status = status
     },
     sortChange(data) {
       // const { prop, order } = data;
@@ -364,19 +362,19 @@ export default {
       // }
     },
     sortByID(order) {
-      if (order === "ascending") {
-        this.listQuery.sort = "+id";
+      if (order === 'ascending') {
+        this.listQuery.sort = '+id'
       } else {
-        this.listQuery.sort = "-id";
+        this.listQuery.sort = '-id'
       }
-      this.handleFilter();
+      this.handleFilter()
     },
     // 清除表单
     resetTemps() {
       this.temps = {
-        lineId: "",
-        name: "",
-      };
+        lineId: '',
+        name: ''
+      }
     },
     // resetTemp() {
     //   this.temp = {
@@ -390,93 +388,93 @@ export default {
     //   };
     // },
     handleCreate() {
-      this.resetTemps();
-      this.dialogStatus = "create";
-      this.dialogFormVisible = true;
+      this.resetTemps()
+      this.dialogStatus = 'create'
+      this.dialogFormVisible = true
       this.$nextTick(() => {
-        this.$refs["dataForm"].clearValidate();
-      });
+        this.$refs['dataForm'].clearValidate()
+      })
     },
     createData() {
-      this.$refs["dataForm"].validate((valid) => {
+      this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           // this.temp.id = parseInt(Math.random() * 100) + 1024; // mock a id
           // this.temp.author = "vue-element-admin";
           createTrain(this.temps).then((res) => {
             // this.list.unshift(this.temp);
-            this.getList();
+            this.getList()
             // console.log("新增列车", res);
-            this.dialogFormVisible = false;
+            this.dialogFormVisible = false
             this.$notify({
-              title: "成功",
-              message: "创建成功",
-              type: "success",
-              duration: 2000,
-            });
-          });
+              title: '成功',
+              message: '创建成功',
+              type: 'success',
+              duration: 2000
+            })
+          })
         }
-      });
+      })
     },
     handleUpdate(row) {
-      this.temps = Object.assign({}, row); // copy obj
-      this.dialogStatus = "update";
-      this.dialogFormVisible = true;
+      this.temps = Object.assign({}, row) // copy obj
+      this.dialogStatus = 'update'
+      this.dialogFormVisible = true
     },
     updateData() {
-      this.$refs["dataForm"].validate((valid) => {
+      this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           Update(this.temps).then(() => {
-            this.getList();
-            this.dialogFormVisible = false;
+            this.getList()
+            this.dialogFormVisible = false
             this.$notify({
-              title: "成功",
-              message: "更新成功",
-              type: "success",
-              duration: 2000,
-            });
-          });
+              title: '成功',
+              message: '更新成功',
+              type: 'success',
+              duration: 2000
+            })
+          })
         }
-      });
+      })
     },
     handleDelete(row, index) {
       this.$confirm(
-        "此操作将永久删除id为 " + index + " 的线路, 是否继续?",
-        "提示",
+        '此操作将永久删除id为 ' + index + ' 的线路, 是否继续?',
+        '提示',
         {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning",
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
         }
       )
         .then(() => {
           // 确认删除的逻辑
           this.$message({
-            type: "success",
-            message: "删除成功!",
-          });
+            type: 'success',
+            message: '删除成功!'
+          })
         })
         .catch(() => {
           // 取消删除的逻辑
           this.$message({
-            type: "info",
-            message: "已取消删除",
-          });
-        });
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
     },
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
-        this.pvData = response.data.pvData;
-        this.dialogPvVisible = true;
-      });
+        this.pvData = response.data.pvData
+        this.dialogPvVisible = true
+      })
     },
     handleDownload() {
       this.listQuery = {
         pageIndex: 1,
         pageRow: 10,
         lineId: undefined,
-        name: undefined,
-      };
-      this.getList();
+        name: undefined
+      }
+      this.getList()
       // this.downloadLoading = true;
       // import("@/vendor/Export2Excel").then((excel) => {
       //   const tHeader = ["timestamp", "title", "type", "importance", "status"];
@@ -499,20 +497,20 @@ export default {
     formatJson(filterVal) {
       return this.list.map((v) =>
         filterVal.map((j) => {
-          if (j === "timestamp") {
-            return parseTime(v[j]);
+          if (j === 'timestamp') {
+            return parseTime(v[j])
           } else {
-            return v[j];
+            return v[j]
           }
         })
-      );
+      )
     },
-    getSortClass: function (key) {
-      const sort = this.listQuery.sort;
-      return sort === `+${key}` ? "ascending" : "descending";
-    },
-  },
-};
+    getSortClass: function(key) {
+      const sort = this.listQuery.sort
+      return sort === `+${key}` ? 'ascending' : 'descending'
+    }
+  }
+}
 </script>
 
 <style>

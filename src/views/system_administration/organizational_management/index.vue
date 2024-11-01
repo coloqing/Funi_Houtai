@@ -20,15 +20,13 @@
       border
       :header-cell-style="{ backgroundColor: 'rgb(244, 243, 249)' }"
     >
-      <el-table-column prop="name" label="部门" min-width="180" align="center">
-      </el-table-column>
+      <el-table-column prop="name" label="部门" min-width="180" align="center" />
       <el-table-column
         prop="time"
         label="创建时间"
         min-width="180"
         align="center"
-      >
-      </el-table-column>
+      />
       <el-table-column
         :label="$t('table.actions')"
         align="center"
@@ -69,9 +67,9 @@
             v-model="selectedLeafNode"
             :options="tableData"
             :props="{ checkStrictly: true, value: 'id', label: 'name' }"
-            @change="handleChange"
             style="width: 100%"
-          ></el-cascader>
+            @change="handleChange"
+          />
         </el-form-item>
         <el-form-item label="排序" prop="order" label-width="100px">
           <el-input v-model="temps.order" placeholder="请排序" />
@@ -96,8 +94,8 @@
 import {
   getOrgStructure,
   createOrgStructure,
-  Update,
-} from "@/api/system_administration/organizational_management";
+  Update
+} from '@/api/system_administration/organizational_management'
 export default {
   data() {
     return {
@@ -110,189 +108,189 @@ export default {
       tableData: [
         {
           id: 3,
-          name: "wangxiaohu",
-          time: "2016-05-01",
+          name: 'wangxiaohu',
+          time: '2016-05-01',
           children: [
             {
               id: 31,
-              name: "wangxiaohu",
-              time: "2016-05-01",
+              name: 'wangxiaohu',
+              time: '2016-05-01'
             },
             {
               id: 32,
-              name: "wangxiaohu",
-              time: "2016-05-01",
+              name: 'wangxiaohu',
+              time: '2016-05-01',
               children: [
                 {
                   id: 41,
-                  name: "wangxiaohu",
-                  time: "2016-05-01",
+                  name: 'wangxiaohu',
+                  time: '2016-05-01'
                 },
                 {
                   id: 42,
-                  name: "wangxiaohu",
-                  time: "2016-05-01",
-                },
-              ],
-            },
-          ],
+                  name: 'wangxiaohu',
+                  time: '2016-05-01'
+                }
+              ]
+            }
+          ]
         },
         {
           id: 4,
-          name: "wangxiaohu",
-          time: "2016-05-03",
-        },
+          name: 'wangxiaohu',
+          time: '2016-05-03'
+        }
       ],
-      //查询数据
+      // 查询数据
       from: {},
       // 新增/修改 表单
       temps: {
-        name: "",
+        name: '',
         parentId: null,
-        order: 0,
+        order: 0
       },
       rules: {
-        type: [{ required: true, message: "请输入省市", trigger: "change" }],
+        type: [{ required: true, message: '请输入省市', trigger: 'change' }],
         timestamp: [
           {
-            type: "date",
+            type: 'date',
             required: true,
-            message: "timestamp is required",
-            trigger: "change",
-          },
+            message: 'timestamp is required',
+            trigger: 'change'
+          }
         ],
-        title: [{ required: true, message: "请输入线路", trigger: "blur" }],
+        title: [{ required: true, message: '请输入线路', trigger: 'blur' }],
         textMap: {
-          update: "Edit",
-          create: "Create",
-        },
+          update: 'Edit',
+          create: 'Create'
+        }
       },
-      textMap: "",
+      textMap: '',
       // dialogVisible: false,
       dialogType: null,
       dialogVisible: false,
       // 下拉框 菜单树选项
-      menuOptions: [],
-    };
+      menuOptions: []
+    }
   },
   computed: {
     routesData() {
-      return this.routes;
-    },
+      return this.routes
+    }
   },
   created() {
-    this.getList();
+    this.getList()
   },
   methods: {
     // 查询
     getList(form) {
-      this.listLoading = true;
+      this.listLoading = true
       getOrgStructure().then((response) => {
         if (response.success) {
           // console.log("组织结构管理list:", response);
-          this.tableData = response.data;
+          this.tableData = response.data
           // this.total = response.data.length;
-          this.listLoading = false;
+          this.listLoading = false
         } else {
-          console.error("组织结构管理list获取失败");
+          console.error('组织结构管理list获取失败')
         }
-      });
+      })
     },
     // 点击新增
     handleAddRole() {
-      this.dialogStatus = "new";
-      this.dialogVisible = true;
-      this.reset_temps();
-      this.selectedLeafNode = null;
+      this.dialogStatus = 'new'
+      this.dialogVisible = true
+      this.reset_temps()
+      this.selectedLeafNode = null
     },
     // 新增
     createData() {
-      this.$refs["dataForm"].validate((valid) => {
+      this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           if (this.temps.parentId === null) {
-            this.temps.parentId = 0;
+            this.temps.parentId = 0
           }
           createOrgStructure(this.temps).then((res) => {
             // console.log("新增部门", res);
-            this.getList();
-            this.dialogVisible = false;
+            this.getList()
+            this.dialogVisible = false
             this.$notify({
-              title: "成功",
-              message: "创建成功",
-              type: "success",
-              duration: 2000,
-            });
-            this.reset_temps();
-          });
+              title: '成功',
+              message: '创建成功',
+              type: 'success',
+              duration: 2000
+            })
+            this.reset_temps()
+          })
         }
-      });
+      })
     },
     // 点击修改
     handleUpdate(row) {
-      this.temps = Object.assign({}, row); // copy obj
+      this.temps = Object.assign({}, row) // copy obj
       // let tmp = this.temps.province;
       // this.temps.province = [tmp, this.temps.city];
       // this.temp.timestamp = new Date(this.temp.timestamp);
       // console.log("操作的对象", this.temps);
-      this.dialogStatus = "update";
-      this.dialogVisible = true;
+      this.dialogStatus = 'update'
+      this.dialogVisible = true
     },
     // 修改
     updateData() {
-      this.$refs["dataForm"].validate((valid) => {
+      this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           Update(this.temps).then((res) => {
             // console.log("修改部门", res);
-            this.getList();
-            this.dialogVisible = false;
+            this.getList()
+            this.dialogVisible = false
             this.$notify({
-              title: "成功",
-              message: "修改成功",
-              type: "success",
-              duration: 2000,
-            });
-          });
+              title: '成功',
+              message: '修改成功',
+              type: 'success',
+              duration: 2000
+            })
+          })
         }
-      });
+      })
     },
     // 上级菜单选择
     handleChange(value) {
-      this.temps.parentId = value[value.length - 1];
-      console.log("当前选中的值id:", this.temps.parentId);
+      this.temps.parentId = value[value.length - 1]
+      console.log('当前选中的值id:', this.temps.parentId)
     },
     // 重置temps
     reset_temps() {
       this.temps = {
-        name: "",
+        name: '',
         parentId: null,
-        order: 0,
-      };
+        order: 0
+      }
     },
     // 删除
     handleDelete(row, index) {
       this.$confirm(
-        "此操作将永久删除id为 " + index + " 的线路, 是否继续?",
-        "提示",
+        '此操作将永久删除id为 ' + index + ' 的线路, 是否继续?',
+        '提示',
         {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning",
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
         }
       )
         .then(() => {
           // 确认删除的逻辑
           this.$message({
-            type: "success",
-            message: "删除成功!",
-          });
+            type: 'success',
+            message: '删除成功!'
+          })
         })
         .catch(() => {
           // 取消删除的逻辑
           this.$message({
-            type: "info",
-            message: "已取消删除",
-          });
-        });
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
     },
 
     load(tree, treeNode, resolve) {
@@ -300,19 +298,19 @@ export default {
         resolve([
           {
             id: 31,
-            time: "2016-05-01",
-            name: "wangxiaohu",
+            time: '2016-05-01',
+            name: 'wangxiaohu'
           },
           {
             id: 32,
-            time: "2016-05-01",
-            name: "wangxiaohu",
-          },
-        ]);
-      }, 1000);
-    },
-  },
-};
+            time: '2016-05-01',
+            name: 'wangxiaohu'
+          }
+        ])
+      }, 1000)
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped></style>

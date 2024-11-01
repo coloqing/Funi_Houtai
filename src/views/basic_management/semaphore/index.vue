@@ -8,12 +8,22 @@
           </el-select>
         </el-form-item> -->
         <el-form-item label="信号量名称">
-          <el-input v-model="listQuery.name" placeholder="请输入信号量名称" style="width: 200px; margin-right: 10px"
-            class="filter-item" @keyup.enter.native="handleFilter" />
+          <el-input
+            v-model="listQuery.name"
+            placeholder="请输入信号量名称"
+            style="width: 200px; margin-right: 10px"
+            class="filter-item"
+            @keyup.enter.native="handleFilter"
+          />
         </el-form-item>
         <el-form-item label="卡夫卡字段">
-          <el-input v-model="listQuery.code" placeholder="请输入卡夫卡字段" style="width: 200px; margin-right: 10px"
-            class="filter-item" @keyup.enter.native="handleFilter" />
+          <el-input
+            v-model="listQuery.code"
+            placeholder="请输入卡夫卡字段"
+            style="width: 200px; margin-right: 10px"
+            class="filter-item"
+            @keyup.enter.native="handleFilter"
+          />
         </el-form-item>
         <el-form-item label="信号类型">
           <el-select v-model="listQuery.type" placeholder="请选择信号类型">
@@ -22,12 +32,23 @@
         </el-form-item>
         <!-- 功能按钮 -->
         <el-form-item>
-          <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-refresh"
-            @click="handleDownload">
+          <el-button
+            v-waves
+            :loading="downloadLoading"
+            class="filter-item"
+            type="primary"
+            icon="el-icon-refresh"
+            @click="handleDownload"
+          >
             重置
           </el-button>
-          <el-button class="filter-item" style="margin-left: 10px" type="primary" icon="el-icon-edit"
-            @click="handleCreate">
+          <el-button
+            class="filter-item"
+            style="margin-left: 10px"
+            type="primary"
+            icon="el-icon-edit"
+            @click="handleCreate"
+          >
             新增
           </el-button>
 
@@ -38,11 +59,24 @@
       </el-form>
     </div>
 
-    <el-table :key="tableKey" v-loading="listLoading" :data="parts_list" border
-      :header-cell-style="{ backgroundColor: 'rgb(244, 243, 249)' }" fit highlight-current-row style="width: 100%"
-      @sort-change="sortChange">
-      <el-table-column label="序号" prop="id" align="center" min-width="80"
-        :class-name="getSortClass('id')">
+    <el-table
+      :key="tableKey"
+      v-loading="listLoading"
+      :data="parts_list"
+      border
+      :header-cell-style="{ backgroundColor: 'rgb(244, 243, 249)' }"
+      fit
+      highlight-current-row
+      style="width: 100%"
+      @sort-change="sortChange"
+    >
+      <el-table-column
+        label="序号"
+        prop="id"
+        align="center"
+        min-width="80"
+        :class-name="getSortClass('id')"
+      >
         <template slot-scope="{ row }">
           <span>{{ row.id }}</span>
         </template>
@@ -90,12 +124,23 @@
       </el-table-column>
     </el-table>
 
-    <pagination v-show="total > 0" :total="total" :page-index.sync="listQuery.pageIndex"
-      :page-row.sync="listQuery.pageRow" @pagination="getList" />
+    <pagination
+      v-show="total > 0"
+      :total="total"
+      :page.sync="listQuery.pageIndex"
+      :limit.sync="listQuery.pageRow"
+      @pagination="getList"
+    />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temps" label-position="left" label-width="70px"
-        style="width: 400px; margin-left: 50px">
+      <el-form
+        ref="dataForm"
+        :rules="rules"
+        :model="temps"
+        label-position="left"
+        label-width="70px"
+        style="width: 400px; margin-left: 50px"
+      >
         <el-form-item label="信号量名称" prop="coachType" label-width="120px">
           <el-input v-model="temp.name" placeholder="请输入部件编码" />
         </el-form-item>
@@ -172,7 +217,7 @@ const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
 }, {})
 
 export default {
-  name: 'semaphore',
+  name: 'Semaphore',
   components: { Pagination },
   directives: { waves },
   filters: {
@@ -220,7 +265,7 @@ export default {
         {
           value: 'Digital',
           label: '数字量'
-        },
+        }
       ],
       units_options: [
         {
@@ -238,7 +283,7 @@ export default {
         {
           value: '°C',
           label: '°C'
-        },
+        }
       ],
       tableKey: 0,
       parts_list: [
@@ -297,7 +342,7 @@ export default {
       // ],
       listQuery: {
         pageIndex: 1,
-        pageRow: 10,
+        pageRow: 10
       },
       importanceOptions: [1, 2, 3],
       calendarTypeOptions,
@@ -313,7 +358,7 @@ export default {
         type: null,
         max: null,
         min: null,
-        units: null,
+        units: null
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -451,7 +496,7 @@ export default {
     },
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
-        let array = ''
+        const array = ''
         // for (let i = 0; i < this.temp.indicatorsIds.length; i++) {
         //   if (this.temp.indicatorsIds.length === i + 1) {
         //     array += this.temp.indicatorsIds[i]
@@ -527,7 +572,7 @@ export default {
     handleDownload() {
       this.listQuery = {
         pageIndex: 1,
-        pageRow: 10,
+        pageRow: 10
       }
       this.getList()
     },
@@ -542,7 +587,7 @@ export default {
         })
       )
     },
-    getSortClass: function (key) {
+    getSortClass: function(key) {
       const sort = this.listQuery.sort
       return sort === `+${key}` ? 'ascending' : 'descending'
     }

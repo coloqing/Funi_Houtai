@@ -4,155 +4,73 @@
       <el-form :inline="true">
         <el-form-item label="线路">
           <el-select v-model="listQuery.lineName" placeholder="请选择线路">
-            <el-option
-              v-for="item in line_list"
-              :key="item.id"
-              :label="item.name"
-              :value="item.name"
-            />
+            <el-option v-for="item in line_list" :key="item.id" :label="item.name" :value="item.name" />
           </el-select>
         </el-form-item>
         <el-form-item label="列车号">
-          <el-input
-            v-model="listQuery.trainNum"
-            placeholder="列车号"
-            style="width: 200px; margin-right: 10px"
-            class="filter-item"
-            @keyup.enter.native="handleFilter"
-          />
+          <el-input v-model="listQuery.trainNum" placeholder="列车号" style="width: 200px; margin-right: 10px"
+            class="filter-item" @keyup.enter.native="handleFilter" />
         </el-form-item>
         <!-- 功能按钮 -->
         <el-form-item>
-          <el-button
-            v-waves
-            :loading="downloadLoading"
-            class="filter-item"
-            type="primary"
-            icon="el-icon-refresh"
-            @click="handleDownload"
-          >
+          <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-refresh"
+            @click="handleDownload">
             重置
           </el-button>
-          <el-button
-            class="filter-item"
-            style="margin-left: 10px"
-            type="primary"
-            icon="el-icon-edit"
-            @click="handleCreate"
-          >
+          <el-button class="filter-item" style="margin-left: 10px" type="primary" icon="el-icon-edit"
+            @click="handleCreate">
             新增
           </el-button>
-          <el-button
-            v-waves
-            class="filter-item"
-            type="primary"
-            icon="el-icon-search"
-            @click="handleFilter"
-          >
+          <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
             搜索
           </el-button>
         </el-form-item>
       </el-form>
     </div>
-    <el-table
-      :data="tableData"
-      :header-cell-style="{ backgroundColor: 'rgb(244, 243, 249)' }"
-      style="width: 100%"
-      border
-    >
-      <el-table-column
-        prop="id"
-        label="ID"
-        min-width="100"
-        align="center"
-      />
+    <el-table :data="tableData" :header-cell-style="{ backgroundColor: 'rgb(244, 243, 249)' }" style="width: 100%"
+      border>
+      <el-table-column prop="id" label="ID" min-width="100" align="center" />
       <el-table-column prop="lineName" label="线路" width="180" align="center">
         <template slot-scope="scope">
-          <el-input
-            v-if="scope.row.editable"
-            v-model="scope.row.lineName"
-          />
+          <el-input v-if="scope.row.editable" v-model="scope.row.lineName" />
           <!-- @blur="handleBlur(scope.$index, 'lineName')" -->
           <span v-else>{{ scope.row.lineName }}</span>
         </template>
       </el-table-column>
-      <el-table-column
-        prop="trainNum"
-        label="列车号"
-        min-width="180"
-        align="center"
-      >
+      <el-table-column prop="trainNum" label="列车号" min-width="180" align="center">
         <template slot-scope="scope">
-          <el-input
-            v-if="scope.row.editable"
-            v-model="scope.row.trainNum"
-          />
+          <el-input v-if="scope.row.editable" v-model="scope.row.trainNum" />
           <!-- @blur="handleBlur(scope.$index, 'trainNum')" -->
           <span v-else>{{ scope.row.trainNum }}</span>
         </template>
       </el-table-column>
-      <el-table-column
-        prop="name"
-        label="车厢号"
-        min-width="180"
-        align="center"
-      >
+      <el-table-column prop="name" label="车厢号" min-width="180" align="center">
         <template slot-scope="scope">
-          <el-input
-            v-if="scope.row.editable"
-            v-model="scope.row.name"
-          />
+          <el-input v-if="scope.row.editable" v-model="scope.row.name" />
           <!-- @blur="handleBlur(scope.$index, 'name')" -->
           <span v-else>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" min-width="240" align="center">
         <template slot-scope="scope">
-          <el-button
-            v-if="scope.row.editable"
-            size="small"
-            type="danger"
-            @click="cancelAllEdits(scope.$index, false)"
-          >取消修改</el-button>
-          <el-button
-            v-if="!isAllEditable"
-            size="small"
-            @click="toggleAllEdit(true)"
-          >修改所有</el-button>
-          <el-button
-            v-if="isAllEditable"
-            size="small"
-            type="primary"
-            @click="toggleAllEdit(false)"
-          >修改完成</el-button>
-          <el-button
-            size="mini"
-            type="danger"
-            @click="handleDelete(scope.row, scope.row.id)"
-          >
+          <el-button v-if="scope.row.editable" size="small" type="danger"
+            @click="cancelAllEdits(scope.$index, false)">取消修改</el-button>
+          <el-button v-if="!isAllEditable" size="small" @click="toggleAllEdit(true)">修改所有</el-button>
+          <el-button v-if="isAllEditable" size="small" type="primary" @click="toggleAllEdit(false)">修改完成</el-button>
+          <el-button v-if="!isAllEditable" size="mini" type="danger" @click="handleDelete(scope.row, scope.row.id)">
             删除
           </el-button>
         </template>
       </el-table-column>
     </el-table>
 
-    <pagination
-      v-show="total > 0"
-      :total="total"
-      :page.sync="listQuery.pageIndex"
-      :limit.sync="listQuery.pageRow"
-      @pagination="getList"
-    />
+    <pagination v-show="total > 0" :total="total" :page.sync="listQuery.pageIndex" :limit.sync="listQuery.pageRow"
+      @pagination="getList" />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <!-- :rules="rules" -->
-      <el-form
-        ref="dataForm"
-        :model="temps"
-        label-position="left"
-        label-width="70px"
-        style="width: 400px; margin-left: 50px"
-      >
+      <el-form ref="dataForm" :model="temps" label-position="left" label-width="70px"
+        style="width: 400px; margin-left: 50px">
         <el-form-item label="线路" prop="title" label-width="100px">
           <el-input v-model="temps.lineName" placeholder="请输入线路号" />
         </el-form-item>
@@ -160,17 +78,14 @@
           <el-input v-model="temps.trainNum" placeholder="请输入列车号" />
         </el-form-item>
         <el-form-item label="车厢号" label-width="100px">
-          <el-input v-model="temps.name" placeholder="请输入列车号" />
+          <el-input v-model="temps.name" placeholder="请输入车厢号" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
           {{ $t("table.cancel") }}
         </el-button>
-        <el-button
-          type="primary"
-          @click="dialogStatus === 'create' ? createData() : updateData()"
-        >
+        <el-button type="primary" @click="dialogStatus === 'create' ? createData() : updateData()">
           {{ $t("table.confirm") }}
         </el-button>
       </div>
@@ -242,30 +157,7 @@ export default {
       pcTextArr,
       selectedOptions: [],
       // 自定义可修改
-      tableData: [
-        {
-          id: 1,
-          lineName: '线路1',
-          trainNum: 'T101',
-          name: '01',
-          editable: false
-        },
-        {
-          id: 1,
-          lineName: '线路1',
-          trainNum: 'T101',
-          name: '01',
-          editable: false
-        },
-        {
-          id: 1,
-          lineName: '线路1',
-          trainNum: 'T101',
-          name: '01',
-          editable: false
-        }
-        // 其他数据项...
-      ],
+      tableData: [],
       // 所以线路
       line_list: null,
       isAllEditable: false,
@@ -549,7 +441,7 @@ export default {
         })
       )
     },
-    getSortClass: function(key) {
+    getSortClass: function (key) {
       const sort = this.listQuery.sort
       return sort === `+${key}` ? 'ascending' : 'descending'
     }

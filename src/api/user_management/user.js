@@ -33,7 +33,7 @@ export function Delete(data) {
     url: '/api/User/Delete',
     method: 'post',
     data: {
-      id:data.id
+      id: data.id
     }
   })
 }
@@ -42,7 +42,7 @@ export function getRole(data) {
   return request({
     url: '/api/Role',
     method: 'get',
-    params:data
+    params: data
   })
 }
 // 修改用户角色身份
@@ -50,9 +50,9 @@ export function modRole(query) {
   return request({
     url: '/api/User/ModRole',
     method: 'get',
-    params:{
-        userId:query.userId,
-        roleId:query.roleId
+    params: {
+      userId: query.userId,
+      roleId: query.roleId
     }
   })
 }

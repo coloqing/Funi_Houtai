@@ -3,7 +3,7 @@ import request from '@/utils/request'
 export function getRole(query) {
   return request({
     url: '/api/Role',
-    method: 'get',
+    method: 'get'
     // params: query
   })
 }
@@ -11,7 +11,7 @@ export function getRole(query) {
 export function getApi(data) {
   return request({
     url: '/api/Api',
-    method: 'get',
+    method: 'get'
     // data: data
   })
 }
@@ -39,18 +39,4 @@ export function Delect(query) {
     data: query
   })
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

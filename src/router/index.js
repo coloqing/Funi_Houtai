@@ -118,19 +118,23 @@ import nestedRouter from './modules/nested'
  * all roles can be accessed
  */
 export const constantRoutes = [
-  
-    {
-      path: "/icon",
-      component: Layout,
-      children: [
-        {
-          path: "index",
-          component: () => import("@/views/icons/index"),
-          name: "Icons",
-          meta: { title: "icons", icon: "icon", noCache: true },
-        },
-      ],
-    },
+
+  {
+    path: '/system_administrations',
+    component: Layout,
+    children: [
+      {
+        path: 'configuration',
+        component: () =>
+          import(
+            '@/views/system_administration/configuration_management/index'
+          ),
+        name: 'configuration_management',
+        meta: { title: 'configurationManagement', roles: ['admin', 'editor'], icon: 'el-icon-s-home' }
+      }
+    ]
+  },
+
   /** 自定义路由===================**/
   // {
   //   path: '/basic_management',
@@ -278,8 +282,9 @@ export const constantRoutes = [
     path: '/',
     component: Layout,
     // redirect: '/basic_management/line'
-    redirect: '/icon/index'
-  },
+    // redirect: '/icon/index'
+    redirect: '/system_administrations/configuration'
+  }
   // { path: '*', redirect: '/404', hidden: true }
 
   // {

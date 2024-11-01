@@ -1,7 +1,7 @@
 <template>
   <div class="login-container">
     <!-- <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" autocomplete="on" label-position="left"> -->
-    <el-form ref="loginForm" :model="loginForm"  class="login-form" autocomplete="on" label-position="left">
+    <el-form ref="loginForm" :model="loginForm" class="login-form" autocomplete="on" label-position="left">
 
       <div class="title-container">
         <h3 class="title">
@@ -167,25 +167,25 @@ export default {
     },
     handleLogin() {
       // this.$refs.loginForm.validate(valid => {
-        // if (valid) {
-          this.loading = true
-          console.log(this.loginForm)
-          // 修改账号参数
-          // this.loginForm.loginName = this.loginForm.username
-          // delete this.loginForm.username
-          // console.log(this.loginForm)
-          this.$store.dispatch('user/login', this.loginForm)
-            .then((res) => {
-              // commit('SET_ID', response.user_id)
-              this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
-              this.loading = false
-            })
-            .catch(() => {
-              this.loading = false
-            })
+      // if (valid) {
+      this.loading = true
+      console.log(this.loginForm)
+      // 修改账号参数
+      // this.loginForm.loginName = this.loginForm.username
+      // delete this.loginForm.username
+      // console.log(this.loginForm)
+      this.$store.dispatch('user/login', this.loginForm)
+        .then((res) => {
+          // commit('SET_ID', response.user_id)
+          this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
+          this.loading = false
+        })
+        .catch(() => {
+          this.loading = false
+        })
         // } else {
-          // console.log('error submit!!')
-          // return false
+      // console.log('error submit!!')
+      // return false
         // }
       // })
     },

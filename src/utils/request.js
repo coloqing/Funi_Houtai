@@ -28,7 +28,7 @@ service.interceptors.request.use(
   },
   error => {
     // do something with request error
-    console.log('请求发起失败',error) // for debug
+    console.log('请求发起失败', error) // for debug
     return Promise.reject(error)
   }
 )

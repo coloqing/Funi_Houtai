@@ -117,13 +117,13 @@
         style="width: 400px; margin-left: 50px"
       >
         <el-form-item label="指标名称" prop="coachType" label-width="130px">
-          <el-input v-model="temp.name" placeholder="请输入部件编码" />
+          <el-input v-model="temp.name" placeholder="请输入指标名称" />
         </el-form-item>
         <el-form-item label="最大阈值" label-width="130px">
-          <el-input v-model="temp.max" placeholder="请输入部件名称" />
+          <el-input v-model="temp.max" placeholder="请输入最大阈值" />
         </el-form-item>
         <el-form-item label="最小阈值" label-width="130px">
-          <el-input v-model="temp.min" placeholder="请输入部件名称" />
+          <el-input v-model="temp.min" placeholder="请输入最小阈值" />
         </el-form-item>
         <el-form-item label="关联的信号量编码" label-width="130px">
           <!-- <el-input v-model="temp.indicatorsIds" placeholder="请输入关联性能指标id" /> -->

@@ -86,7 +86,7 @@
           <span>{{ row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="对应卡夫卡数据字段" min-width="110px" align="center">
+      <el-table-column label="卡夫卡字段" min-width="110px" align="center">
         <template slot-scope="{ row }" align="center">
           <span>{{ row.code }}</span>
         </template>
@@ -142,13 +142,13 @@
         style="width: 400px; margin-left: 50px"
       >
         <el-form-item label="信号量名称" prop="coachType" label-width="120px">
-          <el-input v-model="temp.name" placeholder="请输入部件编码" />
+          <el-input v-model="temp.name" placeholder="请输入信号量名称" />
         </el-form-item>
-        <el-form-item label="对应卡夫卡字段" label-width="120px">
-          <el-input v-model="temp.code" placeholder="请输入部件名称" />
+        <el-form-item label="卡夫卡字段" label-width="120px">
+          <el-input v-model="temp.code" placeholder="请输入卡夫卡字段" />
         </el-form-item>
         <el-form-item label="信号类型" label-width="120px">
-          <el-select v-model="temp.type" clearable placeholder="请选择关联性能指标">
+          <el-select v-model="temp.type" clearable placeholder="请选择信号类型">
             <el-option v-for="item in type_options" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
@@ -159,7 +159,7 @@
           <el-input v-model="temp.min" placeholder="请输入最小值" />
         </el-form-item>
         <el-form-item label="单位" label-width="120px">
-          <el-select v-model="temp.units" placeholder="请选择关联性能指标">
+          <el-select v-model="temp.units" placeholder="请选择信号量单位">
             <el-option v-for="item in units_options" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
@@ -238,24 +238,7 @@ export default {
       // 地址选择器
       pcTextArr,
       selectedOptions: [],
-      parts_options: [
-        {
-          value: 1,
-          label: '黄金糕'
-        }, {
-          value: 2,
-          label: '双皮奶'
-        }, {
-          value: 3,
-          label: '蚵仔煎'
-        }, {
-          value: 4,
-          label: '龙须面'
-        }, {
-          value: 5,
-          label: '北京烤鸭'
-        }
-      ],
+      parts_options: [],
       // 信号类型 Analog ：模拟量  Digital : 数字量
       type_options: [
         {

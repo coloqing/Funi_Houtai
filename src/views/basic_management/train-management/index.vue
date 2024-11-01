@@ -107,9 +107,10 @@
             v-if="row.status != 'deleted'"
             size="mini"
             type="primary"
-            @click=""
+            @click="router_link"
           >
-            <router-link to="/basic_management/carriage">修改列车</router-link>
+          修改列车
+            <!-- <router-link style="width: 100%;height: 100%;background-color: pink;" to="/basic_management/carriage">修改列车</router-link> -->
           </el-button>
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             修改
@@ -387,6 +388,13 @@ export default {
     //     type: "",
     //   };
     // },
+    // 路由跳转  
+
+
+
+    router_link(){
+      this.$router.push({ path: '/basic_management/carriage' });
+    },
     handleCreate() {
       this.resetTemps()
       this.dialogStatus = 'create'

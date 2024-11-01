@@ -3,7 +3,7 @@ import request from '@/utils/request'
 export function getOrgStructure(query) {
   return request({
     url: '/api/OrgStructure',
-    method: 'get',
+    method: 'get'
     // params: query
   })
 }
@@ -23,32 +23,4 @@ export function Update(data) {
     data: data
   })
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

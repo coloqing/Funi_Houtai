@@ -8,33 +8,11 @@ export function getConfig(query) {
   })
 }
 // 修改 系统配置
-export function getConfig(query) {
+export function Update(query) {
   return request({
     url: '/api/Config/Update',
-    method: 'get',
-    params: query
+    method: 'post',
+    data: query
   })
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
